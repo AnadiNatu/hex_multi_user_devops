@@ -1,0 +1,107 @@
+hexaorder/
+├── public/
+│   └── vite.svg
+│
+├── src/
+│   ├── app/
+│   │   ├── hooks.ts
+│   │   ├── router.tsx
+│   │   └── store.ts
+│   │
+│   ├── components/
+│   │   ├── charts/
+│   │   │   ├── OrdersChart.tsx
+│   │   │   └── RevenueChart.tsx
+│   │   │
+│   │   ├── layout/
+│   │   │   └── Navbar.tsx
+│   │   │
+│   │   ├── ui/
+│   │   │   ├── Alert.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Breadcrumb.tsx
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Select.tsx
+│   │   │   ├── Table.tsx
+│   │   │   ├── Textarea.tsx
+│   │   │   ├── Toast.tsx
+│   │   │   └── Widget.tsx
+│   │   │
+│   │   └── ErrorBoundary.tsx
+│   │
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── authService.ts
+│   │   │   ├── authSlice.test.ts
+│   │   │   └── authSlice.ts
+│   │   │
+│   │   ├── orders/
+│   │   │   ├── ordersService.ts
+│   │   │   └── ordersSlice.ts
+│   │   │
+│   │   ├── products/
+│   │   │   ├── productsService.ts
+│   │   │   └── productsSlice.ts
+│   │   │
+│   │   └── ui/
+│   │       └── uiSlice.ts
+│   │
+│   ├── hooks/
+│   │   ├── useDebounce.ts
+│   │   ├── useFetch.ts
+│   │   ├── useIntersectionObserver.ts
+│   │   └── useLocalStorage.ts
+│   │
+│   ├── pages/
+│   │   ├── Dashboard.tsx
+│   │   ├── Login.tsx
+│   │   ├── OrderList.tsx
+│   │   ├── ProductDetail.tsx
+│   │   ├── ProductForm.tsx
+│   │   ├── ProductList.tsx
+│   │   └── Profile.tsx
+│   │
+│   ├── routes/
+│   │   └── ProtectedRoute.tsx
+│   │
+│   ├── services/
+│   │   ├── apiService.ts
+│   │   └── mockData.ts
+│   │
+│   ├── tests/
+│   │   ├── setup.ts
+│   │   └── test-utils.tsx
+│   │
+│   ├── types/
+│   │   └── index.ts
+│   │
+│   ├── utils/
+│   │   ├── helpers.ts
+│   │   ├── storage.ts
+│   │   ├── validation.test.ts
+│   │   └── validation.ts
+│   │
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+│
+├── .env.example
+├── .eslintrc.cjs
+├── .gitignore
+├── .prettierrc
+├── DEVELOPMENT.md
+├── README.md
+├── index.html
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── tsconfig.node.json
+├── vite.config.ts
+└── vitest.config.ts

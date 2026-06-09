@@ -1,0 +1,60 @@
+# ================================================================
+# .gitignore — devops/ (Docker Compose & deployment configs)
+# ================================================================
+
+
+# ── SECRETS — most important section ─────────────────────────
+# These files hold real credentials for local and production.
+# Templates (.env.example, .env.prod.example) ARE committed.
+# The actual secret files are NEVER committed.
+.env
+.env.prod
+.env.staging
+.env.*
+.env.example
+.env.prod.example
+.env.*.example
+
+
+# ── Docker local override ─────────────────────────────────────
+# docker-compose.override.yml is a convention Docker Compose uses
+# for local machine overrides. Never commit it.
+docker-compose.override.yml
+
+
+# ── OS artefacts ─────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+
+# ── IDE ──────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.code-workspace
+
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+
+# ── Temp ─────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.swp
+*~
+
+
+# ── SSH keys (if accidentally placed here) ───────────────────
+*.pem
+*.key
+id_rsa
+id_ed25519
+known_hosts

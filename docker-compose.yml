@@ -1,0 +1,172 @@
+# ============================================================
+# docker-compose.yml
+# HexaOrder — Full Stack: Frontend + Backend + PostgreSQL
+#
+# Folder layout expected on your machine AND on EC2:
+#
+#   ~/hexaorder-app/
+#   ├── MultiUserSecurityDemo/   ← backend repo
+#   ├── hexaorder/               ← frontend repo
+#   └── devops/                  ← THIS repo (run compose from here)
+#
+# Usage (run from the devops/ folder):
+#   docker compose --env-file .env up -d --build
+#   docker compose --env-file .env down
+#   docker compose --env-file .env logs -f backend
+#
+# Data persistence:
+#   postgres_data volume is NEVER removed by "down" alone.
+#   Use "docker compose down -v" only if you want to wipe data.
+# ============================================================
+
+services:
+
+  # ──────────────────────────────────────────────────────────
+  # DATABASE  (only used for LOCAL / DEV docker-compose)
+  # For PRODUCTION on AWS use RDS — set DB_URL env var to your
+  # RDS endpoint and do NOT start this service:
+  #   docker compose --env-file .env up -d backend frontend
+  # ──────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: hex_postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-MultiUserDB}
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5432:5432"   # expose only while debugging; remove in production
+
+    volumes:
+      # Named volume — survives container restarts AND "docker compose down"
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: place any init SQL scripts in ./docker/postgres/init/
+      # - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-MultiUserDB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    networks:
+      - hex_net
+
+  # ──────────────────────────────────────────────────────────
+  # BACKEND  — Spring Boot JAR (profile: docker)
+  # ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ../MultiUserSecurityDemo   # sibling folder — separate git repo
+      dockerfile: Dockerfile
+    container_name: hex_backend
+    restart: unless-stopped
+
+    # Spring Boot profile selects application-docker.properties
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+      # ── Database ──────────────────────────────────────────
+      # LOCAL docker-compose: points at the postgres service above
+      # PRODUCTION (RDS): override DB_URL in your .env / EC2 env
+      DB_URL:      ${DB_URL:-jdbc:postgresql://postgres:5432/MultiUserDB}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # ── JWT ───────────────────────────────────────────────
+      JWT_SECRET: ${JWT_SECRET}
+
+      # ── Mail ─────────────────────────────────────────────
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      # ── Twilio ───────────────────────────────────────────
+      TWILIO_ACCOUNT_SID:  ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN:   ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+
+      # ── Google OAuth2 ────────────────────────────────────
+      GOOGLE_CLIENT_ID:     ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+      # ── Cloudinary ───────────────────────────────────────
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY:    ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+
+      # ── AWS ──────────────────────────────────────────────
+      AWS_REGION:      ${AWS_REGION:-ap-south-1}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME:-s3-hex-multiuser}
+      AWS_ACCESS_KEY_ID:     ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+      # ── CORS / Frontend URL ───────────────────────────────
+      # In production set this to your EC2 public IP / domain
+      APP_FRONTEND_URL:         ${APP_FRONTEND_URL:-http://localhost}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost}
+      APP_OAUTH2_REDIRECT_URI:  ${APP_OAUTH2_REDIRECT_URI:-http://localhost/oauth2/callback}
+
+      # ── JVM tuning ───────────────────────────────────────
+      JAVA_TOOL_OPTIONS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+    ports:
+      - "8080:8080"   # optionally remove once Nginx proxies all /api calls
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    networks:
+      - hex_net
+
+  # ──────────────────────────────────────────────────────────
+  # FRONTEND  — React/Vite app served by Nginx
+  # Nginx also reverse-proxies /api/** → backend:8080
+  # ──────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ../hexaorder               # sibling folder — separate git repo
+      dockerfile: Dockerfile
+      args:
+        # Vite bakes this URL into the JS bundle at build time.
+        # When Nginx proxies /api → backend, you can keep this as /api
+        # so the browser hits the same origin (no CORS needed).
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    container_name: hex_frontend
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+      - "443:443"   # reserved for future TLS / Certbot
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - hex_net
+
+# ──────────────────────────────────────────────────────────────
+# VOLUMES — named volumes survive "docker compose down"
+# ──────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
+# ──────────────────────────────────────────────────────────────
+# NETWORKS
+# ──────────────────────────────────────────────────────────────
+networks:
+  hex_net:
+    driver: bridge

@@ -1,0 +1,30 @@
+# ── Version Control ──────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.github
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.idea
+*.iml
+*.iws
+.vscode
+
+# ── Maven build output ────────────────────────────────────────
+target/
+
+# ── Local properties (NEVER copy secrets into image) ─────────
+*.env
+.env
+application-local.properties
+
+# ── OS artefacts ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docs ─────────────────────────────────────────────────────
+*.md
+HELP.md
+
+# ── Test artefacts ───────────────────────────────────────────
+src/test/

@@ -1,0 +1,43 @@
+OAUTH With Google
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<Map>
+<timestamp>2026-04-26T12:45:05.671845400</timestamp>
+<status>500</status>
+<error>Internal Server Error</error>
+<message>An unexpected error occurred. Please try again later.</message>
+<path>/oauth2/authorization/google</path>
+</Map>
+
+User Information Updating is not working because backend doesn't have the update endpoint in this project 
+
+Product Images needs to be uploaded and rendered , both Product page and individual product pages .
+
+Need to add an option to see the passwords to be seen on the "Change Password" form
+
+THe change password is not integrated with the backend properly the api was not hit and the password is not changing 
+
+In the "Create Product" form the "Price" & "Stock" feild are not removing the zero when dynamic inputs are entered . And the "price" number input feild is starting with 0.01 so I want to have proper dynamic entry that user can enter for the both feilds
+
+The profile photo cloudinary link is not getting stored in DB
+In the cloudinary account the profile photos are not going into the correct folder they are sitting in the main "folder" page and not in the designated folder
+The profile photo links are getting deleted from the DB but the photos ar still existing on the cloudinary
+Product Photo upload size needs to be increased and all the photo extentions are triggering this error "org.springframework.web.HttpMediaTypeNotSupportedException: Content-Type 'application/octet-stream' is not supported"
+
+Update product & Create product endpoints both are not working as they should the endpoints are not getting hit . Check the frontend implementation
+
+The application email Utiliy endpoints , notification endppints , otp endpoints , helath and testing endpoints expose them to the "Admin(All Access)" type user  
+
+Admin(All Access) when tryinh to use the "filter wih category" functionaluty the "admin all" api is getting hit , but I want the filtering to happen , same is happening with the "User(All Access)" type user
+2026-04-26 14:04:38 [http-nio-8080-exec-7] INFO  c.e.M.filter.RequestLoggingFilter - [REQUEST] traceId=233c1b8b | GET | /api/product/admin/all 
+2026-04-26 14:04:38 [http-nio-8080-exec-7] INFO  c.e.M.filter.RequestLoggingFilter - [RESPONSE]  traceId=233c1b8b | GET /api/product/admin/all → 200 | 2ms
+
+Admin(All-Access) is missing CRMs for the users , products , orders . And I have enough endpoints to make a well functioning CRMs for the three entities . Create tables with actions column and forms for editing for the three and make make this of only the "Admin(All Access)" type user
+Need on the backend side to restrict the creation of Admin(All Access) {Enum :- ADMIN} to one or two hardcoded entites  
+
+"View the product details" buttons on the product cards are not working correctly for the Admin. 
+
+
+
+"Login with phone" functionality is also not working . The api hit is giving this error . But was working with postman testing 
+2026-04-26 14:36:52 [http-nio-8080-exec-10] ERROR c.e.M.e.GlobalExceptionHandler - [EXCEPTION] Unhandled | type=MissingServletRequestParameterException | path=uri=/api/auth/phone/send-otp | message=Required request parameter 'phone' for method parameter type String is not present
+org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'phone' for method parameter type String is not present 

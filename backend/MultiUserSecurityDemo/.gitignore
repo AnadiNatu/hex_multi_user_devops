@@ -1,0 +1,195 @@
+# # ================= BUILD =================
+# target/
+# build/
+# out/
+# *.class
+
+# # ================= LOGS =================
+# *.log
+# logs/
+# *.out
+# *.err
+# *.gz
+
+# # ================= ENV =================
+# # ================= DOCKER SECRETS =================
+# .env
+# .env.*
+# !.env.example
+
+# # ================= SPRING CONFIG (CRITICAL) =================
+# **/application.properties
+# **/application.yml
+# **/application-*.properties
+# **/application-*.yml
+
+# # ================= SECURITY =================
+# *.pem
+# *.key
+# *.crt
+# *.p12
+# *.jks
+
+# # ================= IDE =================
+# .idea/
+# .vscode/
+# *.iml
+# *.ipr
+# *.iws
+
+# # ================= STS =================
+# .apt_generated
+# .classpath
+# .factorypath
+# .project
+# .settings
+# .springBeans
+# .sts4-cache
+
+# # ================= NETBEANS =================
+# /nbproject/
+# /nbbuild/
+# /dist/
+# /nbdist/
+# /.nb-gradle/
+
+# # ================= OS =================
+# .DS_Store
+# Thumbs.db
+
+# # ================= TEST =================
+# coverage/
+# reports/
+
+# # ================= NODE =================
+# node_modules/
+
+# # ================= TEMP =================
+# *.tmp
+# *.swp
+# *.bak
+
+# # ================= KEEP EXAMPLE =================
+# # !.env.example
+
+# ================================================================
+# .gitignore — MultiUserSecurityDemo (Spring Boot Backend)
+# ================================================================
+
+
+# ── Maven build output ───────────────────────────────────────
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+
+# ── Spring Boot application properties ───────────────────────
+# IMPORTANT: Only application-local.properties is committed.
+# All other profiles contain real credentials → never commit them.
+#
+# Files committed:      application.properties
+#                       application-local.properties   (no real secrets)
+#                       application-docker.properties  (env-var placeholders only)
+#
+# Files blocked here:
+**/application-prod.properties
+**/application-prod.yml
+**/application-staging.properties
+**/application-staging.yml
+
+
+# ── Secrets & credentials ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.truststore
+secret*.yml
+secret*.properties
+
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+*.out
+*.err
+*.gz
+log/
+
+
+# ── IDE — IntelliJ IDEA ───────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+
+
+# ── IDE — VS Code ────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+
+# ── IDE — Eclipse / STS ──────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+
+
+# ── IDE — NetBeans ───────────────────────────────────────────
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+
+# ── OS artefacts ─────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+
+# ── Test / coverage reports ──────────────────────────────────
+coverage/
+reports/
+jacoco.exec
+*.exec
+
+
+# ── Temp / swap ──────────────────────────────────────────────
+*.tmp
+*.swp
+*.swo
+*.bak
+*~
+
+
+# ── Node (if any frontend tooling is added to backend) ───────
+node_modules/
+
+
+# ── Docker ───────────────────────────────────────────────────
+# Do NOT ignore Dockerfile or .dockerignore — those are committed.
+# Only ignore local override files.
+docker-compose.override.yml

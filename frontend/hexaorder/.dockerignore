@@ -1,0 +1,29 @@
+# ── Build output (rebuilt inside Docker) ─────────────────────
+dist/
+node_modules/
+
+# ── Local env files (NEVER copy secrets into image) ──────────
+.env
+.env.local
+.env.development
+.env.production
+
+# ── Version Control ──────────────────────────────────────────
+.git
+.gitignore
+.github
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.idea
+.vscode
+
+# ── OS artefacts ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docs ─────────────────────────────────────────────────────
+*.md
+README.md
+
+# ── Tests ────────────────────────────────────────────────────
+src/tests/
