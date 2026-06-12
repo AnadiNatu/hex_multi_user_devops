@@ -1,4 +1,4 @@
-import React, { useRef, useState, KeyboardEvent, ClipboardEvent } from 'react';
+import { useRef, useState, KeyboardEvent, ClipboardEvent } from 'react';
 import { cn } from '../../utils/helpers';
 
 interface OtpVerificationInputProps {

@@ -13,7 +13,6 @@ import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Alert } from '../components/ui/Alert';
 import { ConfirmDialog } from '../components/ui/Modal';
 import { SkeletonTable } from '../components/ui/LoadingSpinner';
 import { useDebounce } from '../hooks/useDebounce';

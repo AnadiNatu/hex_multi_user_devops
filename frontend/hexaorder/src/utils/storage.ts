@@ -116,7 +116,7 @@ class StorageService {
     const maxSize = 5 * 1024 * 1024; // 5MB (typical localStorage limit)
     
     try {
-      const testKey = `${this.prefix}__test__`;
+      // const testKey = `${this.prefix}__test__`;
       let currentSize = 0;
 
       // Calculate current size

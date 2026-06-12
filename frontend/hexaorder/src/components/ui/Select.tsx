@@ -1,4 +1,4 @@
-import React, { forwardRef, SelectHTMLAttributes } from 'react';
+import { forwardRef, SelectHTMLAttributes } from 'react';
 import { cn } from '../../utils/helpers';
 import { ChevronDown } from 'lucide-react';
 

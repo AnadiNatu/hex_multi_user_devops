@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { cn } from '../../utils/helpers';
 import { ChevronUp, X } from 'lucide-react';
 

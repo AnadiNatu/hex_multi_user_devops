@@ -1,82 +1,3 @@
-# # ================= BUILD =================
-# target/
-# build/
-# out/
-# *.class
-
-# # ================= LOGS =================
-# *.log
-# logs/
-# *.out
-# *.err
-# *.gz
-
-# # ================= ENV =================
-# # ================= DOCKER SECRETS =================
-# .env
-# .env.*
-# !.env.example
-
-# # ================= SPRING CONFIG (CRITICAL) =================
-# **/application.properties
-# **/application.yml
-# **/application-*.properties
-# **/application-*.yml
-
-# # ================= SECURITY =================
-# *.pem
-# *.key
-# *.crt
-# *.p12
-# *.jks
-
-# # ================= IDE =================
-# .idea/
-# .vscode/
-# *.iml
-# *.ipr
-# *.iws
-
-# # ================= STS =================
-# .apt_generated
-# .classpath
-# .factorypath
-# .project
-# .settings
-# .springBeans
-# .sts4-cache
-
-# # ================= NETBEANS =================
-# /nbproject/
-# /nbbuild/
-# /dist/
-# /nbdist/
-# /.nb-gradle/
-
-# # ================= OS =================
-# .DS_Store
-# Thumbs.db
-
-# # ================= TEST =================
-# coverage/
-# reports/
-
-# # ================= NODE =================
-# node_modules/
-
-# # ================= TEMP =================
-# *.tmp
-# *.swp
-# *.bak
-
-# # ================= KEEP EXAMPLE =================
-# # !.env.example
-
-# ================================================================
-# .gitignore — MultiUserSecurityDemo (Spring Boot Backend)
-# ================================================================
-
-
 # ── Maven build output ───────────────────────────────────────
 target/
 build/
@@ -88,25 +9,26 @@ out/
 *.nar
 
 
-# ── Spring Boot application properties ───────────────────────
-# IMPORTANT: Only application-local.properties is committed.
-# All other profiles contain real credentials → never commit them.
-#
-# Files committed:      application.properties
-#                       application-local.properties   (no real secrets)
-#                       application-docker.properties  (env-var placeholders only)
-#
-# Files blocked here:
-**/application-prod.properties
-**/application-prod.yml
-**/application-staging.properties
-**/application-staging.yml
+!src/main/resources/application-local.properties
+src/main/resources/application-prod.properties
+src/main/resources/application-prod.yml
 
+src/main/resources/application-staging.properties
+src/main/resources/application-staging.yml
+src/main/resources/application.properties
 
 # ── Secrets & credentials ─────────────────────────────────────
+# Environment files
 .env
-.env.*
+.env.local
+.env.prod
+.env.staging
+
+# Allow templates
 !.env.example
+!.env.prod.example
+!.env.staging.example
+docker-compose.override.yml
 *.pem
 *.key
 *.p12
@@ -116,6 +38,20 @@ out/
 secret*.yml
 secret*.properties
 
+
+# ─── AWS ──────────────────────────────────────────────────────────
+~/.aws/credentials
+~/.aws/config
+
+# ─── Terraform ───────────────────────────────────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# ── IntelliJ Files ──────────────────────────────────────────────────────────
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
 
 # ── Logs ─────────────────────────────────────────────────────
 *.log

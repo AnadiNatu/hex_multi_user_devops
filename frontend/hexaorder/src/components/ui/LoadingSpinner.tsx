@@ -1,4 +1,3 @@
-import React from 'react';
 import { cn } from '../../utils/helpers';
 import { Loader2 } from 'lucide-react';
 

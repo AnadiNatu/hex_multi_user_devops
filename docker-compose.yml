@@ -61,7 +61,7 @@ services:
   # ──────────────────────────────────────────────────────────
   backend:
     build:
-      context: ../MultiUserSecurityDemo   # sibling folder — separate git repo
+      context: ./backend/MultiUserSecurityDemo   # sibling folder — separate git repo
       dockerfile: Dockerfile
     container_name: hex_backend
     restart: unless-stopped
@@ -136,7 +136,7 @@ services:
   # ──────────────────────────────────────────────────────────
   frontend:
     build:
-      context: ../hexaorder               # sibling folder — separate git repo
+      context: ./frontend/hexaorder               # sibling folder — separate git repo
       dockerfile: Dockerfile
       args:
         # Vite bakes this URL into the JS bundle at build time.

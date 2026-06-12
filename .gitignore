@@ -8,13 +8,13 @@
 # Templates (.env.example, .env.prod.example) ARE committed.
 # The actual secret files are NEVER committed.
 .env
-.env.prod
-.env.staging
 .env.*
-.env.example
-.env.prod.example
-.env.*.example
-
+!.env.example
+!.env.prod.example
+!.env.*.example
+docker-compose.override.yml
+*.pem
+*.key
 
 # ── Docker local override ─────────────────────────────────────
 # docker-compose.override.yml is a convention Docker Compose uses
