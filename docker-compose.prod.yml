@@ -28,7 +28,7 @@ services:
   # ──────────────────────────────────────────────────────────
   backend:
     build:
-      context: ../MultiUserSecurityDemo   # sibling folder — separate git repo
+      context: ./backend/MultiUserSecurityDemo    # sibling folder — separate git repo
       dockerfile: Dockerfile
     container_name: hex_backend
     restart: always
@@ -98,7 +98,7 @@ services:
   # ──────────────────────────────────────────────────────────
   frontend:
     build:
-      context: ../hexaorder               # sibling folder — separate git repo
+      context: ./frontend/hexaorder               # sibling folder — separate git repo
       dockerfile: Dockerfile
       args:
         VITE_API_BASE_URL: /api

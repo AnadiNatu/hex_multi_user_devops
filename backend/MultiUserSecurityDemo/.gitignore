@@ -8,14 +8,16 @@ out/
 *.ear
 *.nar
 
+# ================= SPRING CONFIG (CRITICAL) =================
+# Block local properties — has real secrets
+**/application.properties
+**/application.yml
+**/application-local.properties
+**/application-local.yml
 
-!src/main/resources/application-local.properties
-src/main/resources/application-prod.properties
-src/main/resources/application-prod.yml
-
-src/main/resources/application-staging.properties
-src/main/resources/application-staging.yml
-src/main/resources/application.properties
+# ✅ ALLOW — only contain ${ENV_VAR} placeholders, safe to commit
+!**/application-docker.properties
+!**/application-prod.properties
 
 # ── Secrets & credentials ─────────────────────────────────────
 # Environment files
