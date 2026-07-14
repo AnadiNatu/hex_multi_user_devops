@@ -83,9 +83,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    @Caching(put = {@CachePut(value = "products" , key = "#id")},
-             evict = {@CacheEvict(value = "productsByCategory" , allEntries = true),
-                   @CacheEvict(value = "productStatistics" , allEntries = true)}
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "products", allEntries = true),
+                    @CacheEvict(value = "productsByCategory", allEntries = true),
+                    @CacheEvict(value = "productStatistics", allEntries = true),
+                    @CacheEvict(value = "categories", allEntries = true)
+            }
     )
     public ProductResponse updateProduct(Long id, ProductRequest request, MultipartFile image ,String updatedBy) {
 
@@ -239,8 +243,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Caching(
-            put = {@CachePut(value = "products" , key = "#id")},
-            evict = {@CacheEvict(value = "productStatistics" , allEntries = true)}
+            evict = {
+                    @CacheEvict(value = "products", allEntries = true),
+                    @CacheEvict(value = "productsByCategory", allEntries = true),
+                    @CacheEvict(value = "productStatistics", allEntries = true),
+                    @CacheEvict(value = "categories", allEntries = true)
+            }
     )
     public ProductResponse updateProductStock(Long id, Integer quantity, String updatedBy) {
         StopWatch sw = new StopWatch("updateProductStock");
@@ -331,10 +339,13 @@ public class ProductServiceImpl implements ProductService {
         return analysis;
     }
 
-    @Override
-    @Caching(put = {@CachePut(value = "products" , key = "#id")},
-            evict = {@CacheEvict(value = "productStatistics" , allEntries = true),
-            @CacheEvict(value = "productsByCategory" , allEntries = true)}
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "products", allEntries = true),
+                    @CacheEvict(value = "productsByCategory", allEntries = true),
+                    @CacheEvict(value = "productStatistics", allEntries = true),
+                    @CacheEvict(value = "categories", allEntries = true)
+            }
     )
     public ProductResponse toggleProductActive(Long id, String updatedBy) {
         StopWatch sw = new StopWatch("toggleProductActive");

@@ -36,11 +36,7 @@ public class AdminProvisionController {
     // ═══════════════════════════════════════════════════════════════════════
     //  ADMIN-ONLY: create + approve TYPE1 users (ADMIN1 / ADMIN2)
     // ═══════════════════════════════════════════════════════════════════════
-    /**
-     * ADMIN creates a new ADMIN_TYPE1 or ADMIN_TYPE2 account.
-     * The created user receives a verification OTP email automatically.
-     * They must still verify their email, but are pre-approved by the ADMIN.
-     */
+
     @PostMapping("/admin-user")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<SignUpResponse> createAdminUser(
@@ -82,10 +78,6 @@ public class AdminProvisionController {
         return ResponseEntity.status(status).body(response);
     }
 
-    /**
-     * ADMIN approves a pending TYPE1 account (in case auto-pre-approve is disabled
-     * or an account was created via the public signup form).
-     */
     @PostMapping("/approve/type1/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> approveType1User(
@@ -128,9 +120,6 @@ public class AdminProvisionController {
                         .body(Map.of("message", "TYPE1 user not found with id=" + id)));
     }
 
-    /**
-     * ADMIN lists all pending (unapproved) TYPE1 accounts.
-     */
     @GetMapping("/pending/type1")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> pendingType1Users() {
@@ -152,12 +141,6 @@ public class AdminProvisionController {
     // ═══════════════════════════════════════════════════════════════════════
     //  ADMIN2-ONLY: create + approve TYPE2 users (USER1 / USER2)
     // ═══════════════════════════════════════════════════════════════════════
-
-    /**
-     * ADMIN_TYPE2 creates a new USER_TYPE1 or USER_TYPE2 account.
-     * The created user receives a verification OTP email automatically.
-     * They must still verify their email, but are pre-approved.
-     */
     @PostMapping("/user")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE2')")
     public ResponseEntity<SignUpResponse> createUser(
@@ -241,9 +224,6 @@ public class AdminProvisionController {
                         .body(Map.of("message", "TYPE2 user not found with id=" + id)));
     }
 
-    /**
-     * ADMIN or ADMIN_TYPE2 lists all pending (unapproved) TYPE2 accounts.
-     */
     @GetMapping("/pending/type2")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE2')")
     public ResponseEntity<List<Map<String, Object>>> pendingType2Users() {
@@ -263,10 +243,6 @@ public class AdminProvisionController {
     }
 
     // ── Password recovery trigger (admin can trigger for any managed user) ─
-
-    /**
-     * ADMIN triggers a password-reset OTP for any TYPE1 user by id.
-     */
     @PostMapping("/reset-password/type1/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, Object>> adminTriggerPasswordResetType1(

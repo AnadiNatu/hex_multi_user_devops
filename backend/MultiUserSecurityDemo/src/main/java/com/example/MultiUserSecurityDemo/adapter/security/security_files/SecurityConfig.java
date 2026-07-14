@@ -1,6 +1,7 @@
 package com.example.MultiUserSecurityDemo.adapter.security.security_files;
 
 import com.example.MultiUserSecurityDemo.adapter.security.oauth2.OAuth2SuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +48,7 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:4200}")
     private String allowedOrigins;
 
-    // ================= SECURITY FILTER CHAIN =================
+    // SECURITY FILTER CHAIN
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,7 +59,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // ========== PUBLIC ENDPOINTS ==========
+                        // PUBLIC ENDPOINTS
                                 .requestMatchers(
                                         "/api/auth/**",
                                         "/uploads/**",
@@ -66,9 +67,25 @@ public class SecurityConfig {
                                         "/api/otp/**",
                                         "/oauth2/**",
                                         "/login/oauth2/**",
-                                        "/api/oauth2/failure"
+                                        "/api/oauth2/failure",
+                                        "/api/password/forgot",
+                                        "/api/password/reset",
+                                        "/api/password/change"
                                 ).permitAll()
-                        // ========== USER MANAGEMENT ENDPOINTS ==========
+
+                        // ADMIN PROVISIONING
+                                .requestMatchers("/api/admin/provision/admin-user").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/provision/approve/type1/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/provision/pending/type1").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/provision/reset-password/type1/**").hasAuthority("ADMIN")
+
+                        // ADMIN2 PROVISIONING
+                                .requestMatchers("/api/admin/provision/user").hasAnyAuthority("ADMIN", "ADMIN_TYPE2")
+                                .requestMatchers("/api/admin/provision/approve/type2/**").hasAnyAuthority("ADMIN", "ADMIN_TYPE2")
+                                .requestMatchers("/api/admin/provision/pending/type2").hasAnyAuthority("ADMIN", "ADMIN_TYPE2")
+                                .requestMatchers("/api/admin/provision/reset-password/type2/**").hasAnyAuthority("ADMIN", "ADMIN_TYPE2")
+
+                        // USER MANAGEMENT ENDPOINTS
                         // TYPE1 (Admin) User Management
                                 .requestMatchers("/api/type1/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/type1/admin-type1/**").hasAuthority("ADMIN_TYPE1")
@@ -80,7 +97,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/type2/user-type2/**").hasAuthority("USER_TYPE2")
                         .requestMatchers("/api/type2/all-user/**").hasAnyAuthority("USER", "USER_TYPE1", "USER_TYPE2")
 
-                        // ========== PRODUCT ENDPOINTS ==========
+                        // PRODUCT ENDPOINTS
 
                                 //    Full control — ADMIN only
                                 .requestMatchers("/api/product/admin/**").hasAuthority("ADMIN")
@@ -95,16 +112,16 @@ public class SecurityConfig {
                                 //    Price compare / sort — TYPE2-domain roles
                                 .requestMatchers("/api/product/user-type2/**").hasAnyAuthority("ADMIN", "ADMIN_TYPE2", "USER", "USER_TYPE2")
 
-                                // ========== ORDER ENDPOINTS ==========
+                                // ORDER ENDPOINTS
                                 //    Admin order management — ADMIN + ADMIN_TYPE2
                                 .requestMatchers("/api/orders/admin/**").hasAnyAuthority("ADMIN", "ADMIN_TYPE2")
                                 //    All other order paths — ADMIN + ADMIN_TYPE2 + USER + USER_TYPE2
                                 .requestMatchers("/api/orders/**").hasAnyAuthority("ADMIN", "ADMIN_TYPE2", "USER", "USER_TYPE2")
 
-                                // ========== PROFILE ENDPOINTS ==========
+                                // PROFILE ENDPOINTS
                                 .requestMatchers("/api/profile/**").authenticated()
 
-                                // ========== OAUTH2 ENDPOINTS ==========
+                                // OAUTH2 ENDPOINTS
                                 .requestMatchers("/api/oauth2/**").authenticated()
 //
                         .anyRequest().authenticated()
@@ -112,14 +129,17 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/oauth/authorization"))
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/oauth2/authorization"))
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/"))
                         .successHandler(oAuth2SuccessHandler)
                         .failureUrl(frontendUrl + "/oauth2/callback?error=oauth2_failed"))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request ,response , authException) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED , authException.getMessage());
+                }))
                 .build();
     }
 
-    // ================= AUTH PROVIDER (FIXED) =================
+    // AUTH PROVIDER (FIXED)
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -129,14 +149,14 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // ================= PASSWORD ENCODER =================
+    // PASSWORD ENCODER
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ================= AUTH MANAGER =================
+    // AUTH MANAGER
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -144,18 +164,19 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // ================= CORS =================
+    // CORS
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
 
-        List<String> origins  = Arrays.asList(allowedOrigins.split(","));
+        List<String> origins = Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList();
         corsConfig.setAllowedOrigins(origins);
         corsConfig.setAllowedMethods(
                 Arrays.asList("GET", "POST", "PUT", "PATCH" ,"DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();

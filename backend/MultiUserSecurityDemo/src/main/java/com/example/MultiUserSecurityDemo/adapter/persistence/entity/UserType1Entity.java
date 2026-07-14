@@ -39,4 +39,15 @@ public class UserType1Entity {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+    @Column(name = "is_approved" , nullable = false)
+    @Builder.Default
+    private boolean isApproved = false;
+
+    @Column(name = "email_verified" , nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+
+    @Column(name = "created_by_admin")
+    private String createdByAdmin;
+
 }

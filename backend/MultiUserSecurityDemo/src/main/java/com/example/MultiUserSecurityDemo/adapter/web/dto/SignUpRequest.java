@@ -15,4 +15,6 @@ public class SignUpRequest {
     private String userType;
     private String role;
 
+    private String createdByAdmin;
+
 }

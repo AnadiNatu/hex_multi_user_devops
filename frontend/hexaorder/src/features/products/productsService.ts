@@ -120,17 +120,23 @@ export const productsService = {
   //Create product — POST /product/admin/create (multipart, ADMIN only)
   createProduct: async (formData: ProductFormData, imageFile?: File | null): Promise<Product> => {
     const fd = new FormData();
-    fd.append(
-      'product',
-      JSON.stringify({
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        stockQuantity: formData.stock,   // frontend uses 'stock', backend expects 'stockQuantity'
-        category: formData.category,
-        isActive: formData.isActive ?? true,
-      })
-    );
+    const productBlob = new Blob(
+  [
+    JSON.stringify({
+      name: formData.name,
+      description: formData.description,
+      price: formData.price,
+      stockQuantity: formData.stock,
+      category: formData.category,
+      isActive: formData.isActive ?? true,
+    }),
+  ],
+  {
+    type: "application/json",
+  }
+);
+
+fd.append("product", productBlob);
     if (imageFile) {
       fd.append('image', imageFile);
     }
@@ -142,33 +148,44 @@ export const productsService = {
   //Update product — PUT /product/admin-type2/update-price/{id} (multipart)
    
   updateProduct: async (
-    id: string,
-    formData: ProductFormData,
-    imageFile?: File | null
-  ): Promise<Product> => {
-    const fd = new FormData();
-    fd.append(
-      'product',
+  id: string,
+  formData: ProductFormData,
+  imageFile?: File | null
+): Promise<Product> => {
+
+  const fd = new FormData();
+
+  // Send the product as a JSON Blob so Spring can deserialize @RequestPart
+  const productBlob = new Blob(
+    [
       JSON.stringify({
         name: formData.name,
         description: formData.description,
         price: formData.price,
-        stockQuantity: formData.stock,   // map stock → stockQuantity
+        stockQuantity: formData.stock,
         category: formData.category,
         isActive: formData.isActive ?? true,
-      })
-    );
-    if (imageFile) {
-      fd.append('image', imageFile);
+      }),
+    ],
+    {
+      type: "application/json",
     }
+  );
 
-    const json = await apiService.upload<any>(
-      API_ENDPOINTS.PRODUCT_AT2_UPDATE_PRICE(id),
-      fd,
-      'PUT'
-    );
-    return mapBackendProduct(json.product || json);
-  },
+  fd.append("product", productBlob);
+
+  if (imageFile) {
+    fd.append("image", imageFile);
+  }
+
+  const json = await apiService.upload<any>(
+    API_ENDPOINTS.PRODUCT_AT2_UPDATE_PRICE(id),
+    fd,
+    "PUT"
+  );
+
+  return mapBackendProduct(json.product || json);
+},
 
   //Delete product — DELETE /product/admin/delete/{id}
   deleteProduct: async (id: string): Promise<void> => {

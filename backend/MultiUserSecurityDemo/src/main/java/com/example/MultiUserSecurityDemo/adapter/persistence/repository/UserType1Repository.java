@@ -4,10 +4,12 @@ import com.example.MultiUserSecurityDemo.adapter.persistence.entity.UserType1Ent
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserType1Repository extends JpaRepository<UserType1Entity , Long> {
     Optional<UserType1Entity> findByEmail(String email);
     Optional<UserType1Entity> findByPhoneNumber(String phone);
+    List<UserType1Entity> findByIsApprovedFalse();
 }

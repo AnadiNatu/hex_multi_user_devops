@@ -1,3 +1,5 @@
+import { authStorage } from "@/utils/storage";
+
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
   'http://localhost:8080/api';
@@ -17,10 +19,11 @@ class ApiService {
     return this.baseURL;
   }
 
-  private getAuthToken(): string | null {
-    return localStorage.getItem('auth_token');
-  }
+private getAuthToken(): string | null {
 
+    return authStorage.getToken();
+
+}
   private buildHeaders(customHeaders?: HeadersInit): HeadersInit {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -40,9 +43,10 @@ class ApiService {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (response.status === 401) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('hexaorder.session');
-      window.location.href = '/login';
+      // localStorage.removeItem('auth_token');
+      // localStorage.removeItem('hexaorder.session');
+      authStorage.clearAuth();
+      window.location.replace("/login");
       throw new Error('Session expired. Please log in again.');
     }
 
@@ -170,12 +174,23 @@ export const API_ENDPOINTS = {
   OTP_VERIFY_EMAIL: '/otp/verify/email',
   OTP_SEND_SMS: '/otp/send/sms',
   OTP_VERIFY_SMS: '/otp/verify/sms',
-  // Password
+
+  // ───────────────── Password ─────────────────
   PASSWORD_FORGOT: '/password/forgot',
   PASSWORD_RESET: '/password/reset',
   PASSWORD_CHANGE: '/password/change',
   // Profile
   PROFILE_PHOTO: '/profile/photo',
+   // ── Admin Provision (ADMIN only) ──────────────────────────────────────────
+  PROVISION_CREATE_ADMIN:    '/admin/provision/admin-user',
+  PROVISION_PENDING_TYPE1:   '/admin/provision/pending/type1',
+  PROVISION_APPROVE_TYPE1:   (id: number) => `/admin/provision/approve/type1/${id}`,
+  PROVISION_RESET_TYPE1:     (id: number) => `/admin/provision/reset-password/type1/${id}`,
+  // ── User Provision (ADMIN + ADMIN_TYPE2) ──────────────────────────────────
+  PROVISION_CREATE_USER:     '/admin/provision/user',
+  PROVISION_PENDING_TYPE2:   '/admin/provision/pending/type2',
+  PROVISION_APPROVE_TYPE2:   (id: number) => `/admin/provision/approve/type2/${id}`,
+  PROVISION_RESET_TYPE2:     (id: number) => `/admin/provision/reset-password/type2/${id}`,
   // Products — ADMIN
   PRODUCT_ADMIN_CREATE: '/product/admin/create',
   PRODUCT_ADMIN_ALL: '/product/admin/all',
@@ -207,4 +222,5 @@ export const API_ENDPOINTS = {
   ORDERS_CREATE: '/orders/create',
   ORDER_DETAIL: (id: string) => `/orders/${id}`,
   ORDER_STATUS: (id: string) => `/orders/admin/status/${id}`,
+
 } as const;

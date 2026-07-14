@@ -49,7 +49,7 @@ public class UserType1Details implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isEmailVerified() && user.isApproved();
     }
 
     public UserType1 getUser(){

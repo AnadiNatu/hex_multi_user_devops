@@ -46,4 +46,15 @@ public class UserType2Entity {
 
     @Column(name = "provider_id")
     private String providerId;
+
+    @Column(name = "is_approved", nullable = false)
+    @Builder.Default
+    private boolean isApproved = false;
+
+    @Column(name = "email_verified" , nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+
+    @Column(name = "created_by_admin")
+    private String createdByAdmin;
 }

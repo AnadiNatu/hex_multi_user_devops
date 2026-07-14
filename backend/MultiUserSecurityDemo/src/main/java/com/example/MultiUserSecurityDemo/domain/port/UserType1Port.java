@@ -3,6 +3,7 @@ package com.example.MultiUserSecurityDemo.domain.port;
 
 import com.example.MultiUserSecurityDemo.domain.model.UserType1;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserType1Port {
@@ -11,5 +12,7 @@ public interface UserType1Port {
     UserType1 save(UserType1 user);
     Optional<UserType1> findById(Long id);
     void deleteById(Long id);
+    List<UserType1> findAll();
+    List<UserType1> findByIsApprovedFalse();
 
 }

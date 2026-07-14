@@ -6,7 +6,9 @@ import com.example.MultiUserSecurityDemo.domain.model.UserType1;
 import com.example.MultiUserSecurityDemo.domain.port.UserType1Port;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class UserType1PersistenceAdapter implements UserType1Port {
@@ -41,5 +43,15 @@ public class UserType1PersistenceAdapter implements UserType1Port {
     @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<UserType1> findAll(){
+        return repository.findAll().stream().map(mapper :: toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserType1> findByIsApprovedFalse(){
+        return repository.findByIsApprovedFalse().stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 }

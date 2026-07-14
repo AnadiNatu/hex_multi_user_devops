@@ -294,9 +294,7 @@
         <finalName>multiuser-demo</finalName>
         <plugins>
 
-            <!-- ================================================== -->
             <!-- COMPILER -->
-            <!-- ================================================== -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

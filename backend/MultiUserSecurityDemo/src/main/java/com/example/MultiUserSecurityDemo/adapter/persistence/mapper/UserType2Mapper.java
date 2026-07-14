@@ -22,7 +22,11 @@ public class UserType2Mapper {
         domain.setRole(UserRoles2.valueOf(entity.getRole()));
         domain.setResetToken(entity.getResetToken());
         domain.setProfilePicture(entity.getProfilePicture());
-
+        domain.setProvider(entity.getProvider());
+        domain.setProviderId(entity.getProviderId());
+        domain.setApproved(entity.isApproved());
+        domain.setEmailVerified(entity.isEmailVerified());
+        domain.setCreatedByAdmin(entity.getCreatedByAdmin());
         return domain;
     }
 
@@ -39,6 +43,11 @@ public class UserType2Mapper {
                 .role(domain.getRole().name())
                 .resetToken(domain.getResetToken())
                 .profilePicture(domain.getProfilePicture())
+                .provider(domain.getProvider())
+                .providerId(domain.getProviderId())
+                .isApproved(domain.isApproved())
+                .emailVerified(domain.isEmailVerified())
+                .createdByAdmin(domain.getCreatedByAdmin())
                 .build();
 
     }

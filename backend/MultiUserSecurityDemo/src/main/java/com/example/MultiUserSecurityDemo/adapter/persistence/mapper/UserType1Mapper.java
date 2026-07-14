@@ -22,6 +22,9 @@ public class UserType1Mapper {
         domain.setRoles1(UserRoles1.valueOf(entity.getRole()));
         domain.setResetToken(entity.getResetToken());
         domain.setProfilePicture(entity.getProfilePicture());
+        domain.setApproved(entity.isApproved());
+        domain.setEmailVerified(entity.isEmailVerified());
+        domain.setCreatedByAdmin(entity.getCreatedByAdmin());
 
         return domain;
     }
@@ -39,6 +42,9 @@ public class UserType1Mapper {
                 .role(domain.getRoles1().name())
                 .resetToken(domain.getResetToken())
                 .profilePicture(domain.getProfilePicture())
+                .isApproved(domain.isApproved())
+                .emailVerified(domain.isEmailVerified())
+                .createdByAdmin(domain.getCreatedByAdmin())
                 .build();
 
     }

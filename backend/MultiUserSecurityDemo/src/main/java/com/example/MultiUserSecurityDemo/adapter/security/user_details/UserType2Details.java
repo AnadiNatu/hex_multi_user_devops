@@ -48,7 +48,7 @@ public class UserType2Details implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isEmailVerified() && user.isApproved();
     }
 
     public UserType2 getUser(){

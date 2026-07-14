@@ -68,10 +68,14 @@ export interface LoginResponse {
   message: string;
   // enriched fields from backend LoginResponse
   userId?: number;
-  firstName?: string;
-  lastName?: string;
+  fname?: string;
+  lname?: string;
   profilePicture?: string;
   phoneNumber?: string;
+  email : string;
+  firstname : string;
+  lastname : string;
+
 }
 
 export interface RegisterData extends LoginCredentials {

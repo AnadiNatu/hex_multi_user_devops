@@ -6,10 +6,60 @@ import { Button } from '../components/ui/Button';
 import { Widget } from '../components/ui/Widget';
 import { Input } from '../components/ui/Input';
 import { Alert } from '../components/ui/Alert';
-import { Package, Mail, Lock, Smartphone } from 'lucide-react';
+import {  Package,
+  Mail,
+  Lock,
+  Smartphone,
+  ShieldCheck,
+  User,
+  Copy, } from 'lucide-react';
 import { cn } from '../utils/helpers';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:8080';
+
+const DEMO_USERS = {
+  ADMIN: [
+    {
+      name: "Super Admin",
+      role: "ADMIN",
+      email: "anadINatu2001+admin@gmail.com",
+      password: "Admin@123",
+    },
+    {
+      name: "Admin Type 1",
+      role: "ADMIN_TYPE1",
+      email: "anadINatu2001+admin1@gmail.com",
+      password: "Admin1@123",
+    },
+    {
+      name: "Admin Type 2",
+      role: "ADMIN_TYPE2",
+      email: "anadINatu2001+admin2@gmail.com",
+      password: "Admin2@123",
+    },
+  ],
+
+  USER: [
+    {
+      name: "User",
+      role: "USER",
+      email: "anadINatu2001+user@gmail.com",
+      password: "User@123",
+    },
+    {
+      name: "User Type 1",
+      role: "USER_TYPE1",
+      email: "anadINatu2001+user1@gmail.com",
+      password: "User1@123",
+    },
+    {
+      name: "User Type 2",
+      role: "USER_TYPE2",
+      email: "anadINatu2001+user2@gmail.com",
+      password: "User2@123",
+    },
+  ],
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,6 +70,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedDemo, setSelectedDemo] = useState<'ADMIN' | 'USER'>('USER');
 
   useEffect(() => {
     if (user) navigate('/dashboard');
@@ -33,9 +84,17 @@ export default function Login() {
     }
   };
 
+  const fillCredentials = (
+  email: string,
+  password: string
+) => {
+  setEmail(email);
+  setPassword(password);
+};
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-blue/20 via-slate-50 to-emerald-50 p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green rounded-2xl shadow-lg mb-4">
@@ -142,6 +201,101 @@ export default function Login() {
             <Smartphone className="w-4 h-4" />
             Sign in with Phone
           </Link>
+
+          <div className="mt-6 border-t border-slate-200 pt-6">
+
+  <h3 className="text-center text-sm font-bold text-slate-700 uppercase tracking-wider">
+    Demo Accounts
+  </h3>
+
+  <div className="flex mt-4 p-1 rounded-xl bg-slate-100">
+
+    <button
+      type="button"
+      onClick={() => setSelectedDemo("ADMIN")}
+      className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+        selectedDemo === "ADMIN"
+          ? "bg-white shadow text-slate-900"
+          : "text-slate-500"
+      }`}
+    >
+      <ShieldCheck className="w-4 h-4 inline mr-2" />
+      Admin
+    </button>
+
+    <button
+      type="button"
+      onClick={() => setSelectedDemo("USER")}
+      className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+        selectedDemo === "USER"
+          ? "bg-white shadow text-slate-900"
+          : "text-slate-500"
+      }`}
+    >
+      <User className="w-4 h-4 inline mr-2" />
+      User
+    </button>
+
+  </div>
+
+  <div className="mt-4 space-y-3">
+
+    {DEMO_USERS[selectedDemo].map((demo) => (
+
+      <div
+        key={demo.role}
+        className="border rounded-xl p-4 hover:border-brand-green hover:shadow-md transition-all"
+      >
+
+        <div className="flex justify-between items-start">
+
+          <div>
+
+            <h4 className="font-semibold text-slate-900">
+              {demo.name}
+            </h4>
+
+            <p className="text-xs text-slate-500 mt-1">
+              {demo.role}
+            </p>
+
+            <p className="mt-3 text-xs text-slate-700">
+
+              <strong>Email</strong>
+
+              <br />
+
+              {demo.email}
+
+            </p>
+
+            <p className="mt-2 text-xs text-slate-700">
+
+              <strong>Password</strong>
+
+              <br />
+
+              {demo.password}
+
+            </p>
+
+          </div>
+
+          <Button
+            size="sm"
+            leftIcon={<Copy className="w-4 h-4" />}
+            onClick={() =>
+              fillCredentials(
+                demo.email,
+                demo.password)}>
+            Fill
+          </Button>
+        </div>
+      </div>
+
+    ))}
+  </div>
+</div>
 
           {/* Sign up link */}
           <p className="mt-5 text-center text-sm text-slate-500">

@@ -1,15 +1,12 @@
-# ── Maven build output ───────────────────────────────────────
-target/
-build/
-out/
-*.class
-*.jar
-*.war
-*.ear
-*.nar
+# ================================================================
+# .gitignore — devops/ (Docker Compose & deployment configs)
+# ================================================================
 
-# ================= SPRING CONFIG (CRITICAL) =================
-# Block local properties — has real secrets
+
+# ── SECRETS — most important section ─────────────────────────
+# These files hold real credentials for local and production.
+# Templates (.env.example, .env.prod.example) ARE committed.
+# The actual secret files are NEVER committed.
 **/application.properties
 **/application.yml
 **/application-local.properties
@@ -33,68 +30,11 @@ out/
 docker-compose.override.yml
 *.pem
 *.key
-*.p12
-*.jks
-*.keystore
-*.truststore
-secret*.yml
-secret*.properties
 
-
-# ─── AWS ──────────────────────────────────────────────────────────
-~/.aws/credentials
-~/.aws/config
-
-# ─── Terraform ───────────────────────────────────────────────────────────
-*.tfstate
-*.tfstate.*
-.terraform/
-
-# ── IntelliJ Files ──────────────────────────────────────────────────────────
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-
-# ── Logs ─────────────────────────────────────────────────────
-*.log
-logs/
-*.out
-*.err
-*.gz
-log/
-
-
-# ── IDE — IntelliJ IDEA ───────────────────────────────────────
-.idea/
-*.iml
-*.ipr
-*.iws
-.idea_modules/
-atlassian-ide-plugin.xml
-
-
-# ── IDE — VS Code ────────────────────────────────────────────
-.vscode/
-*.code-workspace
-
-
-# ── IDE — Eclipse / STS ──────────────────────────────────────
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings/
-.springBeans
-.sts4-cache
-bin/
-
-
-# ── IDE — NetBeans ───────────────────────────────────────────
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# ── Docker local override ─────────────────────────────────────
+# docker-compose.override.yml is a convention Docker Compose uses
+# for local machine overrides. Never commit it.
+docker-compose.override.yml
 
 
 # ── OS artefacts ─────────────────────────────────────────────
@@ -108,26 +48,28 @@ Thumbs.db
 desktop.ini
 
 
-# ── Test / coverage reports ──────────────────────────────────
-coverage/
-reports/
-jacoco.exec
-*.exec
+# ── IDE ──────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.code-workspace
 
 
-# ── Temp / swap ──────────────────────────────────────────────
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+
+# ── Temp ─────────────────────────────────────────────────────
 *.tmp
-*.swp
-*.swo
 *.bak
+*.swp
 *~
 
 
-# ── Node (if any frontend tooling is added to backend) ───────
-node_modules/
-
-
-# ── Docker ───────────────────────────────────────────────────
-# Do NOT ignore Dockerfile or .dockerignore — those are committed.
-# Only ignore local override files.
-docker-compose.override.yml
+# ── SSH keys (if accidentally placed here) ───────────────────
+*.pem
+*.key
+id_rsa
+id_ed25519
+known_hosts

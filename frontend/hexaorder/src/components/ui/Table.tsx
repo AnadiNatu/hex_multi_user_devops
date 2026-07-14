@@ -21,6 +21,7 @@ interface TableProps<T> {
   striped?:          boolean;
   hoverable?:        boolean;
   bordered?:         boolean;
+  loading?:          boolean;
 }
 
 export function Table<T>({
@@ -34,6 +35,7 @@ export function Table<T>({
   striped           = false,
   hoverable         = true,
   bordered          = false,
+  // loading= false,
 }: TableProps<T>) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);

@@ -11,6 +11,34 @@ public class UserType1 {
     private UserRoles1 roles1;
     private String resetToken;
     private String profilePicture;
+    private boolean isApproved;
+
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getCreatedByAdmin() {
+        return createdByAdmin;
+    }
+
+    public void setCreatedByAdmin(String createdByAdmin) {
+        this.createdByAdmin = createdByAdmin;
+    }
+
+    private boolean emailVerified;
+    private String createdByAdmin;
 
     public UserType1() {
     }

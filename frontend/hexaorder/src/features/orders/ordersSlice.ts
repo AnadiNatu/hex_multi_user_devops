@@ -4,27 +4,25 @@ import { ordersService } from './ordersService';
 import { RootState } from '../../app/store';
 
 interface OrdersState {
-  items: Order[];
-  fetchStatus: 'idle' | 'loading' | 'failed';
+  items:        Order[];
+  fetchStatus:  'idle' | 'loading' | 'failed';
   createStatus: 'idle' | 'loading' | 'failed';
   updateStatus: 'idle' | 'loading' | 'failed';
-  message: string | null;
-  error: string | null;
+  message:      string | null;
+  error:        string | null;
 }
 
 const initialState: OrdersState = {
-  items: [],
-  fetchStatus: 'idle',
+  items:        [],
+  fetchStatus:  'idle',
   createStatus: 'idle',
   updateStatus: 'idle',
-  message: null,
-  error: null,
+  message:      null,
+  error:        null,
 };
 
 export const fetchOrders = createAsyncThunk<
-  Order[],
-  void,
-  { state: RootState; rejectValue: string }
+  Order[], void, { state: RootState; rejectValue: string }
 >('orders/fetchOrders', async (_, { getState, rejectWithValue }) => {
   try {
     const rawRole = getState().auth.user?.rawRole;
@@ -63,59 +61,36 @@ const ordersSlice = createSlice({
   initialState,
   reducers: {
     clearOrderMessage(state) {
-      state.message = null;
-      state.error = null;
+      state.message      = null;
+      state.error        = null;
       state.createStatus = 'idle';
       state.updateStatus = 'idle';
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOrders.pending, (state) => {
-        state.fetchStatus = 'loading';
-        state.error = null;
-      })
-      .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.fetchStatus = 'idle';
-        state.items = action.payload;
-      })
-      .addCase(fetchOrders.rejected, (state, action) => {
-        state.fetchStatus = 'failed';
-        state.error = action.payload ?? 'Unable to load orders';
-      });
+      .addCase(fetchOrders.pending,   (s) => { s.fetchStatus = 'loading'; s.error = null; })
+      .addCase(fetchOrders.fulfilled, (s, a) => { s.fetchStatus = 'idle'; s.items = a.payload; })
+      .addCase(fetchOrders.rejected,  (s, a) => { s.fetchStatus = 'failed'; s.error = a.payload ?? 'Load failed'; });
 
     builder
-      .addCase(createOrder.pending, (state) => {
-        state.createStatus = 'loading';
-        state.message = null;
-        state.error = null;
+      .addCase(createOrder.pending,   (s) => { s.createStatus = 'loading'; s.message = null; s.error = null; })
+      .addCase(createOrder.fulfilled, (s, a) => {
+        s.createStatus = 'idle';
+        s.items        = [a.payload, ...s.items];
+        s.message      = 'Order created successfully';
       })
-      .addCase(createOrder.fulfilled, (state, action) => {
-        state.createStatus = 'idle';
-        state.items = [action.payload, ...state.items];
-        state.message = 'Order created successfully';
-      })
-      .addCase(createOrder.rejected, (state, action) => {
-        state.createStatus = 'failed';
-        state.error = action.payload ?? 'Unable to create order';
-      });
+      .addCase(createOrder.rejected,  (s, a) => { s.createStatus = 'failed'; s.error = a.payload ?? 'Create failed'; });
 
     builder
-      .addCase(updateOrderStatus.pending, (state) => {
-        state.updateStatus = 'loading';
-        state.message = null;
-        state.error = null;
+      .addCase(updateOrderStatus.pending,   (s) => { s.updateStatus = 'loading'; s.message = null; s.error = null; })
+      .addCase(updateOrderStatus.fulfilled, (s, a) => {
+        s.updateStatus = 'idle';
+        const idx = s.items.findIndex((o) => o.id === a.payload.id);
+        if (idx !== -1) s.items[idx] = a.payload;
+        s.message = 'Order status updated';
       })
-      .addCase(updateOrderStatus.fulfilled, (state, action) => {
-        state.updateStatus = 'idle';
-        const idx = state.items.findIndex((o) => o.id === action.payload.id);
-        if (idx !== -1) state.items[idx] = action.payload;
-        state.message = 'Order status updated';
-      })
-      .addCase(updateOrderStatus.rejected, (state, action) => {
-        state.updateStatus = 'failed';
-        state.error = action.payload ?? 'Unable to update order';
-      });
+      .addCase(updateOrderStatus.rejected,  (s, a) => { s.updateStatus = 'failed'; s.error = a.payload ?? 'Update failed'; });
   },
 });
 

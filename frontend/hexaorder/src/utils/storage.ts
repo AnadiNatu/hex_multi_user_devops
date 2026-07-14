@@ -1,4 +1,3 @@
-
 type StorageType = 'local' | 'session';
 
 class StorageService {

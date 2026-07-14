@@ -1,3 +1,7 @@
+// src/features/auth/authSlice.ts
+// FIX: loginUser thunk merges /me data on top of login data correctly,
+// preserving rawRole. loginSuccess also handles OAuth2 callback correctly.
+
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User, SignUpRequest } from '../../types';
 import { authService } from './authService';
@@ -14,25 +18,40 @@ const initialState: AuthState = {
   error: null,
 };
 
-// ── EMAIL LOGIN
+// ── Email login ──────────────────────────────────────────────────────────────
 export const loginUser = createAsyncThunk<
   User,
   { email: string; password: string },
   { rejectValue: string }
 >('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
+    // 1. Login → user with token + rawRole from response
     const user = await authService.login(credentials.email, credentials.password);
-    // Enrich with /me profile data
+
+    // 2. Enrich with /me data (profilePicture, phoneNumber etc.) but keep rawRole from login
     const meData = await authService.fetchMe();
-    return { ...user, ...meData };
+
+    // rawRole from login response is authoritative; don't let /me overwrite it
+    // unless /me also returns a role (it does in our fixed backend).
+    const merged: User = {
+      ...user,
+      ...meData,
+      // Ensure critical identity fields from login are kept
+      token:    user.token,
+      rawRole:  meData.rawRole || user.rawRole,
+      role:     meData.role    || user.role,
+      userType: meData.userType || user.userType,
+    };
+
+    authService.storeUser(merged);
+    return merged;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Unable to log in';
+    const message = error instanceof Error ? error.message : 'Unable to log in';
     return rejectWithValue(message);
   }
 });
 
-// ── PHONE LOGIN
+// ── Phone OTP login ──────────────────────────────────────────────────────────
 export const phoneLogin = createAsyncThunk<
   User,
   { phone: string; otp: string },
@@ -41,13 +60,13 @@ export const phoneLogin = createAsyncThunk<
   try {
     return await authService.verifyPhoneOtp(phone, otp);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'OTP verification failed';
-    return rejectWithValue(message);
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'OTP verification failed'
+    );
   }
 });
 
-// ── SIGNUP
+// ── Signup ────────────────────────────────────────────────────────────────────
 export const signupUser = createAsyncThunk<
   void,
   SignUpRequest,
@@ -56,21 +75,22 @@ export const signupUser = createAsyncThunk<
   try {
     await authService.signup(payload);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Signup failed';
-    return rejectWithValue(message);
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Signup failed'
+    );
   }
 });
 
+// ── Slice ─────────────────────────────────────────────────────────────────────
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     logoutUser(state) {
-      authService.clearSession();
-      state.user = null;
+      authService.logout();
+      state.user   = null;
       state.status = 'idle';
-      state.error = null;
+      state.error  = null;
     },
 
     updateUser(state, action: PayloadAction<Partial<User>>) {
@@ -80,61 +100,47 @@ const authSlice = createSlice({
       }
     },
 
-    // Used by OAuth2 callback to inject user directly
+    // Used by OAuth2 callback to inject the user directly into the store
     loginSuccess(state, action: PayloadAction<User>) {
       state.status = 'idle';
-      state.user = action.payload;
-      state.error = null;
+      state.user   = action.payload;
+      state.error  = null;
       authService.storeUser(action.payload);
     },
   },
 
   extraReducers: (builder) => {
     builder
-      // EMAIL LOGIN
-      .addCase(loginUser.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
+      // Email login
+      .addCase(loginUser.pending,  (state) => { state.status = 'loading'; state.error = null; })
+      .addCase(loginUser.fulfilled,(state, action) => {
         state.status = 'idle';
-        state.user = action.payload;
-        state.error = null;
-        authService.storeUser(action.payload);
+        state.user   = action.payload;
+        state.error  = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ?? 'Unable to log in';
+        state.error  = action.payload ?? 'Unable to log in';
       })
 
-      // PHONE LOGIN
-      .addCase(phoneLogin.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(phoneLogin.fulfilled, (state, action: PayloadAction<User>) => {
+      // Phone login
+      .addCase(phoneLogin.pending,  (state) => { state.status = 'loading'; state.error = null; })
+      .addCase(phoneLogin.fulfilled,(state, action) => {
         state.status = 'idle';
-        state.user = action.payload;
-        state.error = null;
-        authService.storeUser(action.payload);
+        state.user   = action.payload;
+        state.error  = null;
       })
       .addCase(phoneLogin.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ?? 'OTP login failed';
+        state.error  = action.payload ?? 'OTP login failed';
       })
 
-      // SIGNUP
-      .addCase(signupUser.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(signupUser.fulfilled, (state) => {
-        state.status = 'idle';
-        state.error = null;
-      })
-      .addCase(signupUser.rejected, (state, action) => {
+      // Signup
+      .addCase(signupUser.pending,   (state) => { state.status = 'loading'; state.error = null; })
+      .addCase(signupUser.fulfilled, (state) => { state.status = 'idle'; state.error = null; })
+      .addCase(signupUser.rejected,  (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ?? 'Signup failed';
+        state.error  = action.payload ?? 'Signup failed';
       });
   },
 });

@@ -12,6 +12,33 @@ public class UserType2 {
     private String resetToken;
     private String profilePicture;
     private String provider;
+    private boolean isApproved;
+    private boolean emailVerified;
+    private String createdByAdmin;
+
+    public boolean isApproved() {
+        return isApproved;
+    }
+
+    public void setApproved(boolean approved) {
+        isApproved = approved;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getCreatedByAdmin() {
+        return createdByAdmin;
+    }
+
+    public void setCreatedByAdmin(String createdByAdmin) {
+        this.createdByAdmin = createdByAdmin;
+    }
 
     public String getProvider() {
         return provider;
