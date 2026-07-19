@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+//@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
+
 @RestController
 @RequestMapping("/api/dashboard")
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 public class DashboardController {
 
     private final ProductService productService;

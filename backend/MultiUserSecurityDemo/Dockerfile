@@ -41,6 +41,9 @@ RUN chown appuser:appgroup app.jar
 
 USER appuser
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+CMD curl -f http://localhost:8080/actuator/health || exit 1
+
 # Spring Boot listens on 8080
 EXPOSE 8080
 

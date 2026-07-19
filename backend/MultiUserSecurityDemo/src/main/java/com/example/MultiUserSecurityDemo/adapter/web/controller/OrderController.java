@@ -18,9 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
+
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 @RequiredArgsConstructor
 @Slf4j
 public class OrderController {

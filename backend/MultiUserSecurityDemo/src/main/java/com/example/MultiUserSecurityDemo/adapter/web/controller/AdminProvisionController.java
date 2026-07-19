@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+//@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:4200"})
 @RestController
 @RequestMapping("/api/admin/provision")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:4200"})
 @RequiredArgsConstructor
 @Slf4j
 public class AdminProvisionController {

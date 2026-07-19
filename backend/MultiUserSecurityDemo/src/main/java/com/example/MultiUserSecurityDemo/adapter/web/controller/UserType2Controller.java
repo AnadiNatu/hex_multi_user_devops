@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+//@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 
 @RestController
 @RequestMapping("/api/type2")
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 public class UserType2Controller {
 
     @GetMapping("/user/dashboard")

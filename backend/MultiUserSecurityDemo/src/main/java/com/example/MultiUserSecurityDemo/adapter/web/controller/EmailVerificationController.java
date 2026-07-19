@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+//@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:4200"})
+
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:4200"})
 @RequiredArgsConstructor
 @Slf4j
 public class EmailVerificationController {

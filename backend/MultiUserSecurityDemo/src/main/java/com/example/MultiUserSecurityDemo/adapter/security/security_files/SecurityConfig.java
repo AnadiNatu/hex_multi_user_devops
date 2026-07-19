@@ -42,10 +42,10 @@ public class SecurityConfig {
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
-    @Value("${app.frontend.url:http://localhost:5173}")
+    @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:4200}")
+    @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
     // SECURITY FILTER CHAIN

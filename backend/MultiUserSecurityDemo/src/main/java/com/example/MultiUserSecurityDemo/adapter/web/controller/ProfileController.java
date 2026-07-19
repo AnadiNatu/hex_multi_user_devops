@@ -7,6 +7,7 @@ import com.example.MultiUserSecurityDemo.adapter.security.user_details.UserType2
 import com.example.MultiUserSecurityDemo.adapter.web.service.impl.CloudinaryService;
 import com.example.MultiUserSecurityDemo.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 //import java.util.logging.Logger;
+//@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
+
 
 @RestController
 @RequestMapping("/api/profile/")
-@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 @RequiredArgsConstructor
 public class ProfileController {
 

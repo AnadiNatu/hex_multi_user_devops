@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+//@CrossOrigin(origins = {"http://localhost:5173" , "http://localhost:4200"})
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:5173" , "http://localhost:4200"})
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);

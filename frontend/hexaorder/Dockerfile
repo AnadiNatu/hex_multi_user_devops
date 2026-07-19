@@ -39,6 +39,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx listens on 80 inside the container
 EXPOSE 80
+EXPOSE 443
 
 # Use exec form so signals reach Nginx (clean shutdown)
 CMD ["nginx", "-g", "daemon off;"]
