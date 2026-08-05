@@ -19,6 +19,7 @@ function mapBackendOrder(o: any): Order {
     status:      o.status as Order['status'],
     createdAt:   o.createdAt || new Date().toISOString(),
     updatedAt:   o.updatedAt || new Date().toISOString(),
+    userEmail : o.userEmail 
   };
 }
 
@@ -58,4 +59,43 @@ export const ordersService = {
     );
     return mapBackendOrder(json.order ?? json);
   },
+
+  cancelOrder: async (id: string): Promise<Order> => {
+
+    const json = await apiService.put<any>(API_ENDPOINTS.ORDER_CANCEL(id));
+
+    return mapBackendOrder(json.order ?? json);
+},
+
+deleteOwnOrder: async (id: string): Promise<void> => {
+    await apiService.delete(API_ENDPOINTS.ORDER_DELETE_SELF(id));
+},
+
+deleteAdminOrder : async (id : string) : Promise<void> => {
+  await apiService.delete(API_ENDPOINTS.ORDER_DELETE_ADMIN(id))
+},
+
+getOrder: async (id: string): Promise<Order> => {
+    const json = await apiService.get<any>(API_ENDPOINTS.ORDER_DETAIL(id));
+    return mapBackendOrder(json.order ?? json);
+},
+
+getOrdersByStatus: async (status: string): Promise<Order[]> => {
+    const json = await apiService.get<any>(API_ENDPOINTS.ORDER_BY_STATUS(status));
+
+    const list =json.orders ?? json;
+
+    return list.map(mapBackendOrder);
+},
+
+getOrdersByCustomer: async (email: string): Promise<Order[]> => {
+
+    const json = await apiService.get<any>(API_ENDPOINTS.ORDER_BY_CUSTOMER(email));
+
+    const list =json.orders ?? json;
+
+    return list.map(mapBackendOrder);
+},
+
+
 };

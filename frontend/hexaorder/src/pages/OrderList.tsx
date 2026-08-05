@@ -203,7 +203,15 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchOrders, updateOrderStatus, clearOrderMessage, createOrder } from '../features/orders/ordersSlice';
+import {
+    fetchOrders,
+    updateOrderStatus,
+    clearOrderMessage,
+    createOrder,
+    cancelOrder,
+    deleteOwnOrder,
+    deleteAdminOrder
+} from '../features/orders/ordersSlice';
 import { Badge } from '../components/ui/Badge';
 import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { Table } from '../components/ui/Table';
@@ -215,9 +223,18 @@ import { Input } from '../components/ui/Input';
 import { useToast } from '../components/ui/Toast';
 import { formatCurrency, formatDate } from '../utils/helpers';
 import {
-  ShoppingBag, Clock, CheckCircle, XCircle, ShoppingCart, Plus, X
+  ShoppingBag, Clock, CheckCircle, XCircle, ShoppingCart, Plus, X,
+  Ship,
+  Loader,
+  CheckCircle2
 } from 'lucide-react';
 import { Order } from '../types';
+import OrderDetailsDrawer from "../components/ui/OrderDetailsDrawer";
+import CancelOrderDialog from "../components/ui/CancelOrderDialog";
+import DeleteOrderDialog from "../components/ui/DeleteOrderDialog";
+import OrderStatusFilter from "../components/ui/OrderStatusFilter";
+import CustomerFilter from "../components/ui/CustomerFilter";
+
 
 const STATUS_OPTIONS = [
   { value: '',          label: '— Change Status —' },
@@ -242,21 +259,60 @@ export default function OrderList() {
 
   // New order modal state
   const [showNewOrder, setShowNewOrder] = useState(false);
+  const [selectedOrder , setSelectedOrder] = useState<Order | null>(null);
+  const [drawerOpen , setDrawerOpen] = useState(false);
+  
+  const [cancelDialogOpen , setCancelDialogOpen] = useState(false);
+  const [deleteDialogOpen , setDeleteDialogOpen] = useState(false);
+  const [dialogLoading , setDialogLoading] = useState(false);
+
+  const [statusFilter , setStatusFilter] = useState("");
+  const [customerFilter , setCustomerFilter] = useState("");
+
   const [newItems, setNewItems] = useState([{ productId: '', quantity: 1 }]);
 
   useEffect(() => { dispatch(fetchOrders()); }, [dispatch]);
 
-  useEffect(() => {
-    if (message)    { success(message);    dispatch(clearOrderMessage()); }
-    if (storeError) { toastError(storeError); dispatch(clearOrderMessage()); }
-  }, [message, storeError]);
+ useEffect(() => {
+    if (message) {
+        success(message);
+        dispatch(clearOrderMessage());
+    }
+
+    if (storeError) {
+        toastError(storeError);
+        dispatch(clearOrderMessage());
+    }
+
+}, [message,storeError,dispatch,success,toastError,]
+);
+
+  // const filteredOrders = useMemo(() => {
+  //   if (isAdmin) return orders;
+  //   return orders.filter(
+  //     (o) => o.userId === user?.id || o.userId === user?.email
+  //   );
+  // }, [orders, isAdmin, user]);
 
   const filteredOrders = useMemo(() => {
-    if (isAdmin) return orders;
-    return orders.filter(
-      (o) => o.userId === user?.id || o.userId === user?.email
-    );
-  }, [orders, isAdmin, user]);
+
+    let data = isAdmin ? [...orders] : orders.filter(
+                  (o) =>
+                      o.userId === user?.id ||
+                      o.userId === user?.email );
+
+    if (statusFilter) {
+        data = data.filter((o) => o.status === statusFilter);
+    }
+
+    if (isAdmin && customerFilter.trim()) {
+        const search = customerFilter.toLowerCase();
+        data = data.filter((o) => {
+            return ( o.userEmail?.toLowerCase().includes(search) || o.userName?.toLowerCase().includes(search));
+          });
+    }
+    return data;
+}, [orders,user,isAdmin,statusFilter,customerFilter]);
 
   const handleStatusChange = async (orderId: string, status: string) => {
     if (!status) return;
@@ -264,6 +320,73 @@ export default function OrderList() {
       await dispatch(updateOrderStatus({ id: orderId, status: status as Order['status'] })).unwrap();
     } catch (err: any) { toastError(err.message || 'Failed to update status'); }
   };
+
+  const openDrawer = (order: Order) => {
+    setSelectedOrder(order);
+    setDrawerOpen(true);
+  };
+
+  const openCancelDialog = (order: Order) => {
+    setSelectedOrder(order);
+    setCancelDialogOpen(true);
+  };
+
+  const openDeleteDialog = (order: Order) => {
+    setSelectedOrder(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmCancel = async () => {
+
+    if (!selectedOrder) return;
+    try{ 
+        setDialogLoading(true);
+        await dispatch(cancelOrder(selectedOrder.id)).unwrap();
+        await dispatch(fetchOrders());
+        success("Order cancelled.");
+        setCancelDialogOpen(false);
+        setSelectedOrder(null);
+        setDrawerOpen(false);
+    }
+    catch (err: any) {
+        toastError(err.message ||"Unable to cancel order.");
+    }
+    finally {
+        setDialogLoading(false);
+    }
+};
+
+const confirmDelete = async () => {
+
+    if (!selectedOrder) return;
+
+    try {
+        setDialogLoading(true);
+
+        if (isAdmin) {
+            await dispatch(deleteAdminOrder(selectedOrder.id)).unwrap();
+        }
+
+        else {
+            await dispatch(deleteOwnOrder(selectedOrder.id)).unwrap();
+        }
+        await dispatch(fetchOrders());
+
+        success("Order deleted.");
+        setDeleteDialogOpen(false);
+        setSelectedOrder(null);
+        setDrawerOpen(false);
+    }
+
+    catch (err: any) {
+
+        toastError(err.message ||"Unable to delete order.");
+    }
+
+    finally {
+        setDialogLoading(false);
+    }
+};
 
   const handleCreateOrder = async () => {
     const validItems = newItems.filter(i => i.productId.trim() && i.quantity > 0);
@@ -280,6 +403,9 @@ export default function OrderList() {
       case 'COMPLETED': return <Badge variant="success" leftIcon={<CheckCircle className="w-3 h-3" />}>Completed</Badge>;
       case 'PENDING':   return <Badge variant="warning" leftIcon={<Clock className="w-3 h-3" />}>Pending</Badge>;
       case 'CANCELLED': return <Badge variant="error"   leftIcon={<XCircle className="w-3 h-3" />}>Cancelled</Badge>;
+      case 'PROCESSING': return <Badge variant="info" leftIcon={<Loader className="w-3 h-3" />}>Processing</Badge>;
+      case 'SHIPPED' : return <Badge variant="success" leftIcon={<Ship className="w-3 h-3" />}>Shipped</Badge>;
+      case 'SHIPPED' : return <Badge variant="primary"leftIcon={<CheckCircle2 className="w-3 h-3" />}>Delivered</Badge>;
       default:          return <Badge>{status}</Badge>;
     }
   };
@@ -333,6 +459,97 @@ export default function OrderList() {
         />
       ),
     }] : []),
+
+    {
+    key: "actions",
+
+    header: "Actions",
+
+    render: (order: Order) => (
+
+        <div className="flex gap-2 flex-wrap">
+
+            <Button
+
+                size="sm"
+
+                variant="outline"
+
+                onClick={() => openDrawer(order)}
+
+            >
+
+                Details
+
+            </Button>
+
+            {
+
+                !isAdmin &&
+
+                order.status === "PENDING" && (
+
+                    <Button
+
+                        size="sm"
+
+                        disabled = {dialogLoading}
+                        variant="danger"
+
+                        onClick={() =>
+
+                            openCancelDialog(order)
+
+                        }
+
+                    >
+
+                        Cancel
+
+                    </Button>
+
+                )
+
+            }
+
+            {
+
+                (
+
+                    isAdmin ||
+
+                    order.status === "CANCELLED"
+
+                ) && (
+
+                    <Button
+
+                        size="sm"
+
+                        variant="danger"
+
+                        disabled={dialogLoading}
+                        onClick={() =>
+
+                            openDeleteDialog(order)
+
+                        }
+
+                    >
+
+                        Delete
+
+                    </Button>
+
+                )
+
+            }
+
+        </div>
+
+    ),
+
+},
   ];
 
   const pendingCount   = filteredOrders.filter(o => o.status === 'PENDING').length;
@@ -348,11 +565,11 @@ export default function OrderList() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white">
-            {isAdmin ? 'All Orders' : 'My Orders'}
+          <h1 className="text-3xl font-black text-white" >
+            {isAdmin ? 'Order Management' : 'My Orders'}
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            {isAdmin ? 'Manage and update order statuses across all customers.' : 'View your order history.'}
+          <p className="text-slate-400 text-sm mt-2">
+           {isAdmin?"Monitor customer purchases, update statuses and manage all orders.":"Track every purchase and manage your order history."}
           </p>
         </div>
         {!isAdmin && (
@@ -381,6 +598,55 @@ export default function OrderList() {
       </div>
 
       {/* New Order Modal */}
+      {/* ===================================================== */}
+{/* Toolbar */}
+{/* ===================================================== */}
+
+<div className="bg-slate-900/70 border border-slate-700 rounded-2xl p-5">
+
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+        <div className="flex flex-wrap gap-3">
+
+            <OrderStatusFilter
+
+                value={statusFilter}
+
+                onChange={setStatusFilter}
+
+            />
+
+            {isAdmin && (
+
+                <CustomerFilter
+
+                    value={customerFilter}
+
+                    onChange={setCustomerFilter}
+
+                />
+
+            )}
+
+        </div>
+
+        <div className="text-sm text-slate-400">
+
+            Showing
+
+            <span className="font-semibold text-white mx-1">
+
+                {filteredOrders.length}
+
+            </span>
+
+            orders
+
+        </div>
+
+    </div>
+
+</div>
       {showNewOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl">
@@ -446,12 +712,20 @@ export default function OrderList() {
 
     <EmptyState
         icon={<ShoppingCart className="w-12 h-12 text-slate-600" />}
-        title="No orders yet"
+        title={statusFilter ? "No matching orders" : "No orders yet"}
         description={
-            isAdmin
-                ? "No orders have been placed."
-                : "You have no orders. Place your first order!"
-        }
+
+statusFilter
+
+? "Try changing the selected filter."
+
+: isAdmin
+
+? "No customer orders exist."
+
+: "Place your first order."
+
+}
         action={
             !isAdmin
                 ? {
@@ -465,17 +739,97 @@ export default function OrderList() {
 
 ) : (
 
-    <div className="bg-slate-900/70 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+   <div
 
-        <Table
-            columns={columns}
-            data={filteredOrders}
-            keyExtractor={(o) => o.id}
-        />
+className="
+
+bg-slate-900/70
+
+border
+
+border-slate-700
+
+rounded-2xl
+
+shadow-xl
+
+overflow-hidden
+
+transition-all
+
+duration-300
+
+hover:border-brand-green
+
+"
+
+>
+       <Table
+
+columns={columns}
+
+data={filteredOrders}
+
+keyExtractor={(o)=>o.id}
+
+// onRowClick={openDrawer}
+/>
 
     </div>
 
 )}
+
+<OrderDetailsDrawer
+
+    open={drawerOpen}
+
+    order={selectedOrder}
+
+    onClose={() => {
+
+        setDrawerOpen(false);
+
+        setSelectedOrder(null);
+
+    }}
+
+/>
+
+<CancelOrderDialog
+
+    open={cancelDialogOpen}
+
+    loading={dialogLoading}
+
+    onCancel={() => {
+
+        setCancelDialogOpen(false);
+
+        setSelectedOrder(null);
+
+    }}
+
+    onConfirm={confirmCancel}
+/>
+
+
+<DeleteOrderDialog
+
+    open={deleteDialogOpen}
+
+    loading={dialogLoading}
+
+    onCancel={() => {
+
+        setDeleteDialogOpen(false);
+
+        setSelectedOrder(null);
+
+    }}
+
+    onConfirm={confirmDelete}
+
+/>
     </div>
   );
 }

@@ -7,6 +7,8 @@ import { PageLoader } from '../components/ui/LoadingSpinner';
 // import PasswordCenter from '@/pages/PasswordCenter';
 // import PhoneLogin from '@/pages/PhoneLogin';
 
+
+
 // Lazy load all pages
 const Home = lazy(() => import('../pages/Home'));
 const Login          = lazy(() => import('../pages/Login'));
@@ -20,12 +22,18 @@ const ProductDetail  = lazy(() => import('../pages/ProductDetail'));
 const ProductForm    = lazy(() => import('../pages/ProductForm'));
 const OrderList      = lazy(() => import('../pages/OrderList'));
 const Profile        = lazy(() => import('../pages/Profile'));
-const AdminProvisionPanel = lazy(() => import('../pages/AdminProvisionPanel'));
-const AdminUserPanel = lazy(() => import('../pages/AdminUserPanel'));
-const OtpAdminCenter = lazy(() => import('../pages/OtpAdminCenter'));
+// const AdminProvisionPanel = lazy(() => import('../pages/AdminProvisionPanel'));
+// const AdminUserPanel = lazy(() => import('../pages/AdminUserPanel'));
+// const OtpAdminCenter = lazy(() => import('../pages/OtpAdminCenter'));
 const PasswordCenter = lazy(() => import('../pages/PasswordCenter'));
 const ProfileCenter = lazy(() => import('../pages/ProfileCenter'));
-const EmailVerifyPage = lazy(() => import('../pages/EmailVerify') );
+// const EmailVerifyPage = lazy(() => import('../pages/EmailVerify') );
+
+const AdminProvisionPanel = lazy(() => import('../pages/AdminProvisionPanel'));
+const AdminUserPanel      = lazy(() => import('../pages/AdminUserPanel'));
+const OtpAdminCenter      = lazy(() => import('../pages/OtpAdminCenter'));
+const PasswordController  = lazy(() => import('../pages/PasswordController'));
+const EmailVerifyPage     = lazy(() => import('../pages/EmailVerify'));
 
 // const wrap = (C: React.LazyExoticComponent<() => JSX.Element>) => (
 //   <Suspense fallback={<PageLoader />}>
@@ -152,8 +160,11 @@ export const routes: RouteObject[] = [
   {
     element: <RoleProtectedRoute allowedRoles={['ADMIN']} />,
     children: [
-      { path: '/admin/provision', element: wrap(AdminProvisionPanel) },
-    ],
+    { path: '/admin/otp',      element: wrap(OtpAdminCenter)      },
+    { path: '/admin/password', element: wrap(PasswordController)   },
+    { path: '/admin/admins',   element: wrap(AdminProvisionPanel)  },
+    { path: '/admin/users',    element: wrap(AdminUserPanel)       },
+  ],
   },
 
   // ── Catch-all ─────────────────────────────────────────────────────────

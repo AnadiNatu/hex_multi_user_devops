@@ -165,7 +165,9 @@ getToken(): string | null {
 authService.storeUser(user);
 
 return user;
-},
+
+    return user;
+  },
 
   // FETCH CURRENT USER
   fetchMe: async (): Promise<Partial<User>> => {
@@ -206,14 +208,6 @@ return user;
 
         avatar:
           json.profilePicture || '',
-
-        role : json.role,
-        
-        rawRole : json.rawRole,
-
-        userType : json.userType,
-
-        email : json.email,
       };
 
     } catch (error) {
@@ -270,6 +264,8 @@ return user;
 authService.storeUser(user);
 
 return user;
+
+    return user;
   },
 
   // ACTIVE SESSION

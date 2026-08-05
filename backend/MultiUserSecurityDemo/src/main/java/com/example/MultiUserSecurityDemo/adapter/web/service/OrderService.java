@@ -12,4 +12,11 @@ public interface OrderService {
     List<OrderResponse> getOrdersByUser(String userEmail);
     OrderResponse updateOrderStatus(Long id , String status , String updatedBy);
     OrderResponse getOrderById(Long id);
+
+    OrderResponse cancelOrder(Long id , String userEmail);
+    void deleteOwnOrder(Long id , String userEmail);
+
+    void deleteOrder(Long id);
+    List<OrderResponse> getOrdersByStatus(String status);
+    List<OrderResponse> getOrdersByUserEmail(String email);
 }

@@ -18,10 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
-
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})
 @RequiredArgsConstructor
 @Slf4j
 public class OrderController {
@@ -131,6 +130,44 @@ public class OrderController {
                     "details", e.getMessage()
             ));
         }
+    }
+
+    @PutMapping("/cancel/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ADMIN_TYPE2','USER','USER_TYPE2')")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails){
+
+        return ResponseEntity.ok(Map.of("message","Order cancelled successfully", "order",
+                orderService.cancelOrder(id, userDetails.getUsername())));
+    }
+
+    @DeleteMapping("/my/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ADMIN_TYPE2','USER','USER_TYPE2')")
+    public ResponseEntity<?> deleteOwnOrder(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails){
+
+        orderService.deleteOwnOrder(id, userDetails.getUsername());
+
+        return ResponseEntity.ok(Map.of("message", "Order deleted successfully"));
+    }
+
+    @DeleteMapping("/admin/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ADMIN_TYPE2')")
+    public ResponseEntity<?> deleteOrder(@PathVariable Long id){
+        orderService.deleteOrder(id);
+
+        return ResponseEntity.ok(Map.of("message", "Order deleted successfully"));
+    }
+
+    @GetMapping("/admin/status")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ADMIN_TYPE2')")
+    public ResponseEntity<?> getOrdersByStatus(@RequestParam String status){
+
+        return ResponseEntity.ok(orderService.getOrdersByStatus(status));
+    }
+
+    @GetMapping("/admin/user")
+    @PreAuthorize("hasAnyAuthority('ADMIN','ADMIN_TYPE2')")
+    public ResponseEntity<?> getOrdersByUserEmail(@RequestParam String email){
+        return ResponseEntity.ok(orderService.getOrdersByUserEmail(email));
     }
 
 //    Helpers

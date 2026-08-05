@@ -9,10 +9,12 @@ import com.example.MultiUserSecurityDemo.domain.port.OrderPort;
 import com.example.MultiUserSecurityDemo.domain.port.ProductPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderPort orderPort;
     private final ProductPort productPort;
 
-    public OrderServiceImpl(OrderPort orderPort , ProductPort productPort){
+    public OrderServiceImpl(OrderPort orderPort, ProductPort productPort) {
         this.orderPort = orderPort;
         this.productPort = productPort;
     }
@@ -52,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
             var product = productOpt.get();
 
             BigDecimal unitPrice = product.getPrice();
-            BigDecimal subtotal  = unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
+            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
 
             OrderItem item = new OrderItem();
             item.setProductId(product.getId());
@@ -73,6 +75,7 @@ public class OrderServiceImpl implements OrderService {
         return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrderResponse> getAllOrders() {
         return orderPort.findAll().stream()
@@ -80,6 +83,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrderResponse> getOrdersByUser(String userEmail) {
         return orderPort.findByUserEmail(userEmail).stream()
@@ -105,6 +109,7 @@ public class OrderServiceImpl implements OrderService {
         return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public OrderResponse getOrderById(Long id) {
         return orderPort.findById(id)
@@ -113,27 +118,134 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public OrderResponse cancelOrder(Long id, String userEmail) {
+
+        Order order = orderPort.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        if (!order.getUserEmail().equals(userEmail)) {
+            throw new RuntimeException("You cannot cancel another user's order.");
+        }
+
+        if (!"PENDING".equalsIgnoreCase(order.getStatus())) {
+            throw new RuntimeException("Only pending orders can be cancelled.");
+        }
+
+        order.setStatus("CANCELLED");
+        order.setUpdatedAt(LocalDateTime.now());
+
+        return toResponse(orderPort.save(order));
+    }
+
+    @Override
+    public void deleteOwnOrder(Long id, String userEmail) {
+
+        Order order = orderPort.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        if (!order.getUserEmail().equals(userEmail)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        if (!"CANCELLED".equals(order.getStatus())) {
+            throw new RuntimeException(
+                    "Only cancelled orders can be deleted."
+            );
+        }
+
+        orderPort.deleteById(id);
+    }
+
+    @Override
+    public void deleteOrder(Long id) {
+
+        orderPort.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        orderPort.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<OrderResponse> getOrdersByStatus(
+            String status) {
+
+        return orderPort.findAll()
+                .stream()
+                .filter(o ->
+                        o.getStatus().equalsIgnoreCase(status))
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<OrderResponse> getOrdersByUserEmail(String email) {
+
+        return orderPort.findByUserEmail(email)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    // Helper
     private OrderResponse toResponse(Order order) {
-        List<OrderResponse.OrderItemResponse> itemResponses = order.getItems().stream()
-                .map(item -> OrderResponse.OrderItemResponse.builder()
-                        .id(String.valueOf(item.getId()))
-                        .productId(String.valueOf(item.getProductId()))
-                        .productName(item.getProductName())
-                        .quantity(item.getQuantity())
-                        .price(item.getPrice())
-                        .subtotal(item.getSubtotal())
-                        .build())
-                .collect(Collectors.toList());
+
+        List<OrderItem> items =
+                order.getItems() == null
+                        ? Collections.emptyList()
+                        : new ArrayList<>(order.getItems());
+
+        List<OrderResponse.OrderItemResponse> itemResponses =
+
+                items.stream()
+
+                        .map(item ->
+
+                                OrderResponse.OrderItemResponse.builder()
+
+                                        .id(String.valueOf(item.getId()))
+
+                                        .productId(String.valueOf(item.getProductId()))
+
+                                        .productName(item.getProductName())
+
+                                        .quantity(item.getQuantity())
+
+                                        .price(item.getPrice())
+
+                                        .subtotal(item.getSubtotal())
+
+                                        .build()
+
+                        )
+
+                        .toList();
 
         return OrderResponse.builder()
+
                 .id(String.valueOf(order.getId()))
-                .userId(order.getUserEmail())     // frontend uses userId; we store email
+
+                .userId(order.getUserEmail())
+
                 .userName(order.getUserName())
+
                 .items(itemResponses)
+
                 .totalAmount(order.getTotalAmount())
+
                 .status(order.getStatus())
+
                 .createdAt(order.getCreatedAt())
+
                 .updatedAt(order.getUpdatedAt())
+
                 .build();
+
     }
+
 }

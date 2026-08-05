@@ -5,12 +5,15 @@ import com.example.MultiUserSecurityDemo.adapter.persistence.repository.OrderRep
 import com.example.MultiUserSecurityDemo.domain.model.Order;
 import com.example.MultiUserSecurityDemo.domain.port.OrderPort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// Why do we or in which situations we use the Transactional adapter.
 @Component
+@Transactional(readOnly = true)
 public class OrderPersistenceAdapter implements OrderPort {
 
     private final OrderRepository orderRepository;
@@ -22,6 +25,7 @@ public class OrderPersistenceAdapter implements OrderPort {
     }
 
     @Override
+    @Transactional
     public Order save(Order order) {
         var entity = orderMapper.toEntity(order);
         var savedEntity = orderRepository.save(entity);
@@ -50,6 +54,7 @@ public class OrderPersistenceAdapter implements OrderPort {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         orderRepository.deleteById(id);
     }

@@ -222,5 +222,11 @@ export const API_ENDPOINTS = {
   ORDERS_CREATE: '/orders/create',
   ORDER_DETAIL: (id: string) => `/orders/${id}`,
   ORDER_STATUS: (id: string) => `/orders/admin/status/${id}`,
+  ORDER_CANCEL: (id : string) => `/orders/cancel/${id}`,
+  ORDER_DELETE_SELF : (id : string) => `/orders/my/${id}`,
+  ORDER_DELETE_ADMIN : (id : string) => `/orders/admin/${id}`,
+  ORDER_BY_STATUS : (status : string) => `/orders/admin/status?status=${status}`,
+  ORDER_BY_CUSTOMER : (email : string) => `/order/admin/user?email=${encodeURIComponent(email)}`
+
 
 } as const;

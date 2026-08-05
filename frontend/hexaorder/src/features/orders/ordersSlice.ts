@@ -56,6 +56,39 @@ export const updateOrderStatus = createAsyncThunk<
   }
 });
 
+export const cancelOrder = createAsyncThunk<Order, string, {rejectValue:string}>('orders/cancelOrder', async( id, {rejectWithValue})=>{
+try{
+return await ordersService.cancelOrder(id);
+}
+
+catch(error){
+return rejectWithValue(error instanceof Error?error.message:'Unable to cancel order');
+}
+});
+
+
+export const deleteOwnOrder = createAsyncThunk<string,string,{rejectValue:string}>('orders/deleteOwn',async(id,{rejectWithValue})=>{
+try{
+await ordersService.deleteOwnOrder(id);
+return id;
+}
+catch(error){
+return rejectWithValue(error instanceof Error?error.message:'Delete failed');
+}
+});
+
+export const deleteAdminOrder = createAsyncThunk< string, string, {rejectValue:string}>('orders/deleteAdmin', async(id,{rejectWithValue})=>{
+try{
+await ordersService.deleteAdminOrder(id);
+return id;
+}
+catch(error){
+return rejectWithValue(error instanceof Error?error.message:'Delete failed');
+}
+});
+
+
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
@@ -91,6 +124,22 @@ const ordersSlice = createSlice({
         s.message = 'Order status updated';
       })
       .addCase(updateOrderStatus.rejected,  (s, a) => { s.updateStatus = 'failed'; s.error = a.payload ?? 'Update failed'; });
+
+      builder
+      .addCase(cancelOrder.fulfilled , (s,a) => {const idx = s.items.findIndex(o => o.id === a.payload.id) ; 
+        if (idx !== -1){s.items[idx]=a.payload;}
+        s.message='Order cancelled';
+      })
+
+      builder
+      .addCase(deleteOwnOrder.fulfilled , (s,a) => {s.items = s.items.filter(o => o.id !== a.payload); 
+        s.message = 'Order deleted';
+      })
+
+      builder
+      .addCase(deleteAdminOrder.fulfilled , (s,a) => {s.items = s.items.filter(o => o.id! == a.payload);
+        s.message = 'Order deleted';
+      })
   },
 });
 

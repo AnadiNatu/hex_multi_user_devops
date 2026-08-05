@@ -165,7 +165,7 @@ export interface PaginationState {
 }
 
 // Order Types 
-export type OrderStatus = 'PENDING' | 'COMPLETED' | 'CANCELLED';
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED';
 
 export interface OrderItem {
   id: string;
@@ -174,12 +174,14 @@ export interface OrderItem {
   quantity: number;
   price: number;
   subtotal: number;
+  unitPrice: string;
 }
 
 export interface Order {
   id: string;
   userId: string;
   userName: string;
+  userEmail:string;
   items: OrderItem[];
   totalAmount: number;
   status: OrderStatus;
