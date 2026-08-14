@@ -12,6 +12,8 @@ public class UserType1 {
     private String resetToken;
     private String profilePicture;
     private boolean isApproved;
+    private boolean emailVerified;
+    private boolean createdByAdmin;
 
     public boolean isApproved() {
         return isApproved;
@@ -29,16 +31,13 @@ public class UserType1 {
         this.emailVerified = emailVerified;
     }
 
-    public String getCreatedByAdmin() {
+    public boolean isCreatedByAdmin() {
         return createdByAdmin;
     }
 
-    public void setCreatedByAdmin(String createdByAdmin) {
+    public void setCreatedByAdmin(boolean createdByAdmin) {
         this.createdByAdmin = createdByAdmin;
     }
-
-    private boolean emailVerified;
-    private String createdByAdmin;
 
     public UserType1() {
     }

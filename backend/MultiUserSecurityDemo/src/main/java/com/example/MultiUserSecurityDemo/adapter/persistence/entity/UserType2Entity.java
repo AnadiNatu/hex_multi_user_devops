@@ -56,5 +56,5 @@ public class UserType2Entity {
     private boolean emailVerified = false;
 
     @Column(name = "created_by_admin")
-    private String createdByAdmin;
+    private boolean createdByAdmin;
 }

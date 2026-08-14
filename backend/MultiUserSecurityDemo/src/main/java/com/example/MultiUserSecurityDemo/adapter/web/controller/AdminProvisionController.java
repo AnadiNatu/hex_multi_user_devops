@@ -56,7 +56,7 @@ public class AdminProvisionController {
         }
 
         request.setUserType("TYPE1");
-        request.setCreatedByAdmin(callerEmail);
+        request.setCreatedByAdmin(true);
 
         SignUpResponse response = authService.signup(request);
 
@@ -64,7 +64,8 @@ public class AdminProvisionController {
             // ADMIN-created users are pre-approved; they only need email verification
             userType1Port.findByEmail(request.getEmail()).ifPresent(u -> {
                 u.setApproved(true);          // pre-approved by ADMIN
-                u.setCreatedByAdmin(callerEmail);
+//                u.setCreatedByAdmin(callerEmail);
+                u.setCreatedByAdmin(true);
                 userType1Port.save(u);
             });
 
@@ -131,7 +132,8 @@ public class AdminProvisionController {
                         "name", u.getFname() + " " + u.getLname(),
                         "role", u.getRoles1().name(),
                         "emailVerified", u.isEmailVerified(),
-                        "createdByAdmin", u.getCreatedByAdmin() != null ? u.getCreatedByAdmin() : "self-registered"
+                        "createdByAdmin" , true
+//                        "createdByAdmin", u.getCreatedByAdmin() != null ? u.getCreatedByAdmin() : "self-registered"
                 ))
                 .collect(Collectors.toList());
 
@@ -160,7 +162,7 @@ public class AdminProvisionController {
         }
 
         request.setUserType("TYPE2");
-        request.setCreatedByAdmin(callerEmail);
+        request.setCreatedByAdmin(true);
 
         SignUpResponse response = authService.signup(request);
 
@@ -168,7 +170,8 @@ public class AdminProvisionController {
             // Pre-approve: admin2-created users only need email verification
             userType2Port.findByEmail(request.getEmail()).ifPresent(u -> {
                 u.setApproved(true);
-                u.setCreatedByAdmin(callerEmail);
+//                u.setCreatedByAdmin(callerEmail);
+                u.setCreatedByAdmin(true);
                 userType2Port.save(u);
             });
 
@@ -235,7 +238,8 @@ public class AdminProvisionController {
                         "name", u.getFname() + " " + u.getLname(),
                         "role", u.getRole().name(),
                         "emailVerified", u.isEmailVerified(),
-                        "createdByAdmin", u.getCreatedByAdmin() != null ? u.getCreatedByAdmin() : "self-registered"
+                        "createdByAdmin" , true
+//                        "createdByAdmin", u.getCreatedByAdmin() != null ? u.getCreatedByAdmin() : "self-registered"
                 ))
                 .collect(Collectors.toList());
 

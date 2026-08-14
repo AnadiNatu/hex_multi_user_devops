@@ -13,6 +13,17 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
 
+      # ── Redis (Cache) ─────────────────────────────────────
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_TIMEOUT: ${REDIS_TIMEOUT:-2000}
+      REDIS_JEDIS_POOL_MAX_ACTIVE: ${REDIS_JEDIS_POOL_MAX_ACTIVE=8}
+      REDIS_JEDIS_POOL_MAX_IDLE: ${REDIS_JEDIS_POOL_MAX_IDLE=8}
+      REDIS_JEDIS_POOL_MIN_IDLE: ${REDIS_JEDIS_POOL_MIN_IDLE=0}
+      REDIS_JEDIS_POOL_MAX_WAIT: ${REDIS_JEDIS_POOL_MAX_WAIT=1}
+
       JWT_SECRET: ${JWT_SECRET}
 
       MAIL_USERNAME: ${MAIL_USERNAME}
@@ -46,6 +57,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis-app:
+        condition: service_healthy
 
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
@@ -53,6 +66,37 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+
+    networks:
+      - hex_net
+
+  # ──────────────────────────────────────────────────────────
+  # REDIS — In-memory cache for Spring Cache & CachePort
+  # Used for: Product caching, Order caching, Sessions
+  # ──────────────────────────────────────────────────────────
+  redis-app:
+    image: redis:7-alpine
+    container_name: hex_redis
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
     networks:
       - hex_net

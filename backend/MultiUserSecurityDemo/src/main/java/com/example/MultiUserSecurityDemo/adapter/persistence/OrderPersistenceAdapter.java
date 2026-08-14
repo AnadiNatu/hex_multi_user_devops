@@ -58,4 +58,11 @@ public class OrderPersistenceAdapter implements OrderPort {
     public void deleteById(Long id) {
         orderRepository.deleteById(id);
     }
+
+    @Override
+    public List<Order> findByStatus(String status) {
+        return orderRepository.findByStatus(status).stream()
+                .map(orderMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

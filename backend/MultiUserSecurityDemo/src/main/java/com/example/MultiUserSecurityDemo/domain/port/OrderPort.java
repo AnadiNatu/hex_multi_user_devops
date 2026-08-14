@@ -12,5 +12,6 @@ public interface OrderPort {
     List<Order> findAll();
     List<Order> findByUserEmail(String userEmail);
     void deleteById(Long id);
+    List<Order> findByStatus(String status);
 
 }

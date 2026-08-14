@@ -29,6 +29,41 @@ services:
       - hex_net
 
   # ──────────────────────────────────────────────────────────
+  # REDIS — In-memory cache for Spring Cache & CachePort
+  # Used for: Product caching, Order caching, Sessions
+  # ──────────────────────────────────────────────────────────
+  redis-app:
+    image: redis:7-alpine
+    container_name: hex_redis
+    restart: unless-stopped
+
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    networks:
+      - hex_net
+
+
+  # ──────────────────────────────────────────────────────────
   # BACKEND  — Spring Boot JAR (profile: docker)
   # ──────────────────────────────────────────────────────────
   backend:
@@ -48,6 +83,17 @@ services:
       DB_URL:      ${DB_URL:-jdbc:postgresql://postgres:5432/MultiUserDB}
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD}
+
+       # ── Redis (Cache) ─────────────────────────────────────
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_TIMEOUT: ${REDIS_TIMEOUT}
+      REDIS_JEDIS_POOL_MAX_ACTIVE: ${REDIS_JEDIS_POOL_MAX_ACTIVE}
+      REDIS_JEDIS_POOL_MAX_IDLE: ${REDIS_JEDIS_POOL_MAX_IDLE}
+      REDIS_JEDIS_POOL_MIN_IDLE: ${REDIS_JEDIS_POOL_MIN_IDLE}
+      REDIS_JEDIS_POOL_MAX_WAIT: ${REDIS_JEDIS_POOL_MAX_WAIT}
 
       # ── JWT ───────────────────────────────────────────────
       JWT_SECRET: ${JWT_SECRET}
@@ -90,6 +136,8 @@ services:
 
     depends_on:
       postgres:
+        condition: service_healthy
+      redis-app:
         condition: service_healthy
 
     healthcheck:
@@ -136,6 +184,8 @@ services:
 # ──────────────────────────────────────────────────────────────
 volumes:
   postgres_data:
+    driver: local
+  redis_data:
     driver: local
 
 # ──────────────────────────────────────────────────────────────

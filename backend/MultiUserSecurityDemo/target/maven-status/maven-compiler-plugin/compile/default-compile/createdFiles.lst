@@ -28,6 +28,7 @@ com\example\MultiUserSecurityDemo\adapter\web\controller\UserType1Controller.cla
 com\example\MultiUserSecurityDemo\adapter\web\dto\SignUpResponse$SignUpResponseBuilder.class
 com\example\MultiUserSecurityDemo\domain\port\UserType2Port.class
 com\example\MultiUserSecurityDemo\domain\model\UserRoles2.class
+com\example\MultiUserSecurityDemo\domain\port\CachePort.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\product\ProductResponse$ProductResponseBuilder.class
 com\example\MultiUserSecurityDemo\adapter\security\oauth2\OAuth2SuccessHandler.class
 com\example\MultiUserSecurityDemo\adapter\persistence\entity\UserType2Entity$UserType2EntityBuilder.class
@@ -55,6 +56,7 @@ com\example\MultiUserSecurityDemo\adapter\security\security_files\SecurityConfig
 com\example\MultiUserSecurityDemo\notification\EmailService.class
 com\example\MultiUserSecurityDemo\config\SessionConfig.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\order\OrderRequest$OrderItemRequest.class
+com\example\MultiUserSecurityDemo\config\RedisConfig$RedisConnectionTest.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\order\OrderRequest$OrderItemRequest$OrderItemRequestBuilder.class
 com\example\MultiUserSecurityDemo\exception\GlobalExceptionHandler.class
 com\example\MultiUserSecurityDemo\adapter\persistence\repository\UserType1Repository.class
@@ -63,6 +65,7 @@ com\example\MultiUserSecurityDemo\adapter\web\dto\User1DTO.class
 com\example\MultiUserSecurityDemo\adapter\web\controller\PasswordResetController.class
 com\example\MultiUserSecurityDemo\adapter\persistence\entity\ProductEntity$ProductEntityBuilder.class
 com\example\MultiUserSecurityDemo\adapter\web\controller\OAuth2Controller.class
+com\example\MultiUserSecurityDemo\adapter\persistence\RedisCacheAdapter.class
 com\example\MultiUserSecurityDemo\adapter\persistence\ProductPersistenceAdapter.class
 com\example\MultiUserSecurityDemo\adapter\web\controller\AuthController.class
 com\example\MultiUserSecurityDemo\domain\model\UserType2.class
@@ -80,10 +83,12 @@ com\example\MultiUserSecurityDemo\adapter\web\controller\AdminProvisionControlle
 com\example\MultiUserSecurityDemo\adapter\web\controller\DashboardController.class
 com\example\MultiUserSecurityDemo\adapter\security\user_details\UserType1Details.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\MeResponse$MeResponseBuilder.class
+com\example\MultiUserSecurityDemo\config\RedisConfig.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\product\ProductRequest.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\MeResponse.class
 com\example\MultiUserSecurityDemo\exception\DuplicateResourceException.class
 com\example\MultiUserSecurityDemo\adapter\persistence\repository\OrderRepository.class
+com\example\MultiUserSecurityDemo\config\constants\CacheKeyConstants$InvalidationPatterns.class
 com\example\MultiUserSecurityDemo\config\CloudinaryConfig.class
 com\example\MultiUserSecurityDemo\adapter\persistence\entity\OrderEntity$OrderEntityBuilder.class
 com\example\MultiUserSecurityDemo\domain\model\OrderItem.class
@@ -93,6 +98,8 @@ com\example\MultiUserSecurityDemo\adapter\web\controller\UserType2Controller.cla
 com\example\MultiUserSecurityDemo\adapter\web\controller\PhoneController.class
 com\example\MultiUserSecurityDemo\adapter\web\dto\LoginRequest$LoginRequestBuilder.class
 com\example\MultiUserSecurityDemo\config\TwilioConfig.class
+com\example\MultiUserSecurityDemo\config\constants\CacheKeyConstants$CacheTTL.class
+com\example\MultiUserSecurityDemo\config\constants\CacheKeyConstants.class
 com\example\MultiUserSecurityDemo\notification\NotificationService.class
 com\example\MultiUserSecurityDemo\adapter\web\service\impl\TestUserInitializer.class
 com\example\MultiUserSecurityDemo\adapter\persistence\entity\OrderItemEntity.class

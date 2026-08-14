@@ -128,7 +128,7 @@ public class TestUserInitializer implements ApplicationRunner {
 
         admin.setEmailVerified(true);
 
-        admin.setCreatedByAdmin("SYSTEM");
+        admin.setCreatedByAdmin(true);
 
         admin.setProfilePicture(null);
 
@@ -169,7 +169,7 @@ public class TestUserInitializer implements ApplicationRunner {
 
         user.setProvider("LOCAL");
 
-        user.setCreatedByAdmin("SYSTEM");
+        user.setCreatedByAdmin(true);
 
         user.setProfilePicture(null);
 

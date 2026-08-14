@@ -14,7 +14,7 @@ public class UserType2 {
     private String provider;
     private boolean isApproved;
     private boolean emailVerified;
-    private String createdByAdmin;
+    private boolean createdByAdmin;
 
     public boolean isApproved() {
         return isApproved;
@@ -32,11 +32,11 @@ public class UserType2 {
         this.emailVerified = emailVerified;
     }
 
-    public String getCreatedByAdmin() {
+    public boolean isCreatedByAdmin() {
         return createdByAdmin;
     }
 
-    public void setCreatedByAdmin(String createdByAdmin) {
+    public void setCreatedByAdmin(boolean createdByAdmin) {
         this.createdByAdmin = createdByAdmin;
     }
 
