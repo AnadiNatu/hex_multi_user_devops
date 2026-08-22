@@ -188,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products" , key = "'all'")
+//    @Cacheable(value = "products" , key = "'all'")
     public List<ProductResponse> getAllProducts() {
         log.debug("Getting all products");
 
@@ -222,7 +222,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "productsByCategory" , key = "#category")
+//    @Cacheable(value = "productsByCategory" , key = "#category")
     public List<ProductResponse> getProductsByCategory(String category) {
 //        StopWatch sw = new StopWatch("getProductsByCategory");
 //        sw.start();
@@ -488,7 +488,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "productsByCategory" , key = "'analysis_' + #category")
+//    @Cacheable(value = "productsByCategory" , key = "'analysis_' + #category")
     public Map<String, Object> getCategoryPriceAnalysis(String category) {
         log.debug("[getCategoryPriceAnalysis] START | category={}", category);
 

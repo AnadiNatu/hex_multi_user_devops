@@ -35,6 +35,78 @@ const OtpAdminCenter      = lazy(() => import('../pages/OtpAdminCenter'));
 const PasswordController  = lazy(() => import('../pages/PasswordController'));
 const EmailVerifyPage     = lazy(() => import('../pages/EmailVerify'));
 
+const wrap = (C: React.LazyExoticComponent<() => JSX.Element>) => (
+  <Suspense fallback={<PageLoader />}><C /></Suspense>
+);
+
+export const routes: RouteObject[] = [
+  // ── Public ──────────────────────────────────────────────────────────────
+  { path: '/',                element: wrap(Home) },
+  { path: '/login',           element: wrap(Login) },
+  { path: '/signup',          element: wrap(Signup) },
+  { path: '/forgot-password', element: wrap(ForgotPassword) },
+  { path: '/oauth2/callback', element: wrap(OAuth2Callback) },
+  { path: '/verify-email',    element: wrap(EmailVerifyPage) },
+  { path: '/phone-login',     element: wrap(PhoneLogin) },
+
+  // ── Authenticated (any logged-in user) ──────────────────────────────────
+  {
+    element: <ProtectedRoute />,
+    children: [
+      { path: '/dashboard',        element: wrap(Dashboard)     },
+      { path: '/products',         element: wrap(ProductList)   },
+      { path: '/products/:id',     element: wrap(ProductDetail) },
+      { path: '/orders',           element: wrap(OrderList)     },
+      { path: '/profile',          element: wrap(Profile)       },
+    ],
+  },
+
+  // ── Any admin role: product management ────────────────────────────────
+  {
+    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2']} />,
+    children: [
+      { path: '/products/new',      element: wrap(ProductForm) },
+      { path: '/products/:id/edit', element: wrap(ProductForm) },
+    ],
+  },
+
+  // ── ADMIN + ADMIN_TYPE2: user management ─────────────────────────────
+  {
+    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE2']} />,
+    children: [
+      { path: '/admin/users', element: wrap(AdminUserPanel) },
+    ],
+  },
+
+  // ── All admin roles: OTP center, password center, profile center ─────
+  {
+    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2']} />,
+    children: [
+
+      { path: '/admin/otp',      element: wrap(OtpAdminCenter) },
+      { path: '/admin/password', element: wrap(PasswordCenter) },
+      { path: '/admin/profile',  element: wrap(ProfileCenter)  },
+    ],
+  },
+
+  // ── Root ADMIN only: admin provisioning ──────────────────────────────
+  {
+    element: <RoleProtectedRoute allowedRoles={['ADMIN']} />,
+    children: [
+    { path: '/admin/otp',      element: wrap(OtpAdminCenter)      },
+    { path: '/admin/password', element: wrap(PasswordController)   },
+    { path: '/admin/provision',   element: wrap(AdminProvisionPanel)  },
+    { path: '/admin/users',    element: wrap(AdminUserPanel)       },
+  ],
+  },
+
+  // ── Catch-all ─────────────────────────────────────────────────────────
+  { path: '*', element: <Navigate to="/dashboard" replace /> },
+];
+
+export const router = createBrowserRouter(routes);
+
+
 // const wrap = (C: React.LazyExoticComponent<() => JSX.Element>) => (
 //   <Suspense fallback={<PageLoader />}>
 //     <C />
@@ -102,73 +174,3 @@ const EmailVerifyPage     = lazy(() => import('../pages/EmailVerify'));
 // /admin/users accessible to ADMIN + ADMIN_TYPE2.
 // /admin/provision accessible to ADMIN only.
 // Removed ResetPassword page (it's merged into ForgotPassword flow).
-
-const wrap = (C: React.LazyExoticComponent<() => JSX.Element>) => (
-  <Suspense fallback={<PageLoader />}><C /></Suspense>
-);
-
-export const routes: RouteObject[] = [
-  // ── Public ──────────────────────────────────────────────────────────────
-  { path: '/',                element: wrap(Home) },
-  { path: '/login',           element: wrap(Login) },
-  { path: '/signup',          element: wrap(Signup) },
-  { path: '/forgot-password', element: wrap(ForgotPassword) },
-  { path: '/oauth2/callback', element: wrap(OAuth2Callback) },
-  { path: '/verify-email',    element: wrap(EmailVerifyPage) },
-  { path: '/phone-login',     element: wrap(PhoneLogin) },
-
-  // ── Authenticated (any logged-in user) ──────────────────────────────────
-  {
-    element: <ProtectedRoute />,
-    children: [
-      { path: '/dashboard',        element: wrap(Dashboard)     },
-      { path: '/products',         element: wrap(ProductList)   },
-      { path: '/products/:id',     element: wrap(ProductDetail) },
-      { path: '/orders',           element: wrap(OrderList)     },
-      { path: '/profile',          element: wrap(Profile)       },
-    ],
-  },
-
-  // ── Any admin role: product management ────────────────────────────────
-  {
-    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2']} />,
-    children: [
-      { path: '/products/new',      element: wrap(ProductForm) },
-      { path: '/products/:id/edit', element: wrap(ProductForm) },
-    ],
-  },
-
-  // ── ADMIN + ADMIN_TYPE2: user management ─────────────────────────────
-  {
-    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE2']} />,
-    children: [
-      { path: '/admin/users', element: wrap(AdminUserPanel) },
-    ],
-  },
-
-  // ── All admin roles: OTP center, password center, profile center ─────
-  {
-    element: <RoleProtectedRoute allowedRoles={['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2']} />,
-    children: [
-      { path: '/admin/otp',      element: wrap(OtpAdminCenter) },
-      { path: '/admin/password', element: wrap(PasswordCenter) },
-      { path: '/admin/profile',  element: wrap(ProfileCenter)  },
-    ],
-  },
-
-  // ── Root ADMIN only: admin provisioning ──────────────────────────────
-  {
-    element: <RoleProtectedRoute allowedRoles={['ADMIN']} />,
-    children: [
-    { path: '/admin/otp',      element: wrap(OtpAdminCenter)      },
-    { path: '/admin/password', element: wrap(PasswordController)   },
-    { path: '/admin/admins',   element: wrap(AdminProvisionPanel)  },
-    { path: '/admin/users',    element: wrap(AdminUserPanel)       },
-  ],
-  },
-
-  // ── Catch-all ─────────────────────────────────────────────────────────
-  { path: '*', element: <Navigate to="/dashboard" replace /> },
-];
-
-export const router = createBrowserRouter(routes);

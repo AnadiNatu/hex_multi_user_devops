@@ -1,5 +1,6 @@
 package com.example.MultiUserSecurityDemo.adapter.web.service.impl;
 
+import com.example.MultiUserSecurityDemo.adapter.persistence.RedisCacheAdapter;
 import com.example.MultiUserSecurityDemo.adapter.web.dto.order.OrderRequest;
 import com.example.MultiUserSecurityDemo.adapter.web.dto.order.OrderResponse;
 import com.example.MultiUserSecurityDemo.adapter.web.service.OrderService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,60 +29,108 @@ public class OrderServiceImpl implements OrderService {
     private final OrderPort orderPort;
     private final ProductPort productPort;
     private final CachePort cachePort;
+    private final RedisCacheAdapter redisCacheAdapter;
 
     @Override
     public OrderResponse createOrder(OrderRequest request, String userEmail, String userName) {
-        log.info("[createOrder] START | userEmail={} | items={}", userEmail,
-                request.getItems() == null ? 0 : request.getItems().size());
+        log.info(
+                "[createOrder] START | userEmail={} | items={}",
+                userEmail,
+                request.getItems() == null ? 0 : request.getItems().size()
+        );
 
-        try{
-        Order order = new Order();
-        order.setUserEmail(userEmail);
-        order.setUserName(userName);
-        order.setStatus("PENDING");
-        order.setCreatedAt(LocalDateTime.now());
-        Order savedOrder = orderPort.save(order);
-        // Invalidate affected cache entry
+        try {
+            if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+                throw new IllegalArgumentException("Order must contain at least one item");
+            }
+
+            Order order = new Order();
+
+            order.setUserEmail(userEmail);
+            order.setUserName(userName);
+            order.setStatus("PENDING");
+            order.setCreatedAt(LocalDateTime.now());
+
+            List<OrderItem> orderItems = new ArrayList<>();
+            BigDecimal total = BigDecimal.ZERO;
+
+            for (OrderRequest.OrderItemRequest itemReq : request.getItems()) {
+
+                if (itemReq.getProductId() == null) {
+                    throw new IllegalArgumentException("Product ID cannot be null");
+                }
+
+                if (itemReq.getQuantity() == null || itemReq.getQuantity() < 1) {
+                    throw new IllegalArgumentException(
+                            "Quantity must be at least 1 for product: "
+                                    + itemReq.getProductId()
+                    );
+                }
+
+                var productOpt = productPort.findById(itemReq.getProductId());
+
+                if (productOpt.isEmpty()) {
+                    throw new RuntimeException(
+                            "Product not found: " + itemReq.getProductId()
+                    );
+                }
+
+                var product = productOpt.get();
+
+                if (product.getPrice() == null) {
+                    throw new RuntimeException(
+                            "Product has no price: " + itemReq.getProductId()
+                    );
+                }
+
+                BigDecimal unitPrice = product.getPrice();
+
+                BigDecimal subtotal = unitPrice.multiply(
+                        BigDecimal.valueOf(itemReq.getQuantity())
+                );
+
+                OrderItem item = new OrderItem();
+
+                item.setOrder(order);
+                item.setProductId(product.getId());
+                item.setProductName(product.getName());
+                item.setQuantity(itemReq.getQuantity());
+                item.setPrice(unitPrice);
+                item.setSubtotal(subtotal);
+
+                orderItems.add(item);
+
+                total = total.add(subtotal);
+            }
+
+            order.setItems(orderItems);
+            order.setTotalAmount(total);
+
+            Order savedOrder = orderPort.save(order);
+
             invalidateOrderCreateCache(userEmail);
-            log.info("✓ Order created with ID: {} for user: {}", savedOrder.getId(), userEmail);
+
+            log.info(
+                    "[createOrder] SUCCESS | id={} | items={} | total={}",
+                    savedOrder.getId(),
+                    orderItems.size(),
+                    total
+            );
+
             return toResponse(savedOrder);
 
         } catch (Exception e) {
-            log.error("Error creating order for user: {}", userEmail, e);
-            throw new RuntimeException("Failed to create order: " + e.getMessage());
-        }
+            log.error(
+                    "[createOrder] FAILED | userEmail={}",
+                    userEmail,
+                    e
+            );
 
-//        List<OrderItem> orderItems = new ArrayList<>();
-//        BigDecimal total = BigDecimal.ZERO;
-//
-//        for (OrderRequest.OrderItemRequest itemReq : request.getItems()) {
-//            var productOpt = productPort.findById(itemReq.getProductId());
-//            if (productOpt.isEmpty()) {
-//                log.warn("[createOrder] Product not found | id={}", itemReq.getProductId());
-//                continue;
-//            }
-//            var product = productOpt.get();
-//
-//            BigDecimal unitPrice = product.getPrice();
-//            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
-//
-//            OrderItem item = new OrderItem();
-//            item.setProductId(product.getId());
-//            item.setProductName(product.getName());
-//            item.setQuantity(itemReq.getQuantity());
-//            item.setPrice(unitPrice);
-//            item.setSubtotal(subtotal);
-//
-//            orderItems.add(item);
-//            total = total.add(subtotal);
-//        }
-//
-//        order.setItems(orderItems);
-//        order.setTotalAmount(total);
-//
-//        Order saved = orderPort.save(order);
-//        log.info("[createOrder] SUCCESS | id={} | total={}", saved.getId(), total);
-//        return toResponse(saved);
+            throw new RuntimeException(
+                    "Failed to create order: " + e.getMessage(),
+                    e
+            );
+        }
     }
 
 //    @Transactional(readOnly = true)
@@ -156,7 +206,7 @@ public class OrderServiceImpl implements OrderService {
             Order order = orderPort.findById(id).orElseThrow(() -> new RuntimeException("Order not found: " + id));
 
             // Validate status value
-            if (!List.of("PENDING", "COMPLETED", "CANCELLED").contains(status.toUpperCase())) {
+            if (!List.of("PENDING", "PROCESSING" , "COMPLETED", "CANCELLED", "SHIPPED" , "DELIVERED").contains(status.toUpperCase())) {
                 throw new IllegalArgumentException("Invalid status: " + status);
             }
 
@@ -373,10 +423,18 @@ public class OrderServiceImpl implements OrderService {
                 .items(itemResponses)
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
-                .createdAt(order.getCreatedAt())
-                .updatedAt(order.getUpdatedAt())
+                .createdAt(order.getCreatedAt().toString())
+                .updatedAt(order.getUpdatedAt() != null ? order.getUpdatedAt().toString() : null)
                 .build();
+    }
 
+    private void cacheOrderResponse(OrderResponse response) {
+        try {
+            redisCacheAdapter.set("order:" + response.getId(), response , Duration.ofMinutes(30));
+        } catch (Exception e) {
+            // Log but don't fail the request
+            log.warn("[cacheOrderResponse] Failed to cache order: {}", e.getMessage());
+        }
     }
 
     private void invalidateOrderCreateCache(String userEmail) {

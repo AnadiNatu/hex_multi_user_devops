@@ -6,10 +6,19 @@ public class OrderItem {
 
     private Long       id;
     private Long       productId;
+    private Order      order;
     private String     productName;
     private Integer    quantity;
     private BigDecimal price;
     private BigDecimal subtotal;
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
     public BigDecimal getSubtotal() {
         return subtotal;

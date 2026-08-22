@@ -27,20 +27,6 @@ function mapProductList(json: any): Product[] {
 
 // Service 
 export const productsService = {
-  /**
-   * Get products — endpoint varies by role.
-   *
-   * ADMIN              → /product/admin/all       (returns wrapper + statistics)
-   * ADMIN_TYPE1        → /product/admin/all       (same admin view)
-   * ADMIN_TYPE2        → /product/admin/all       (same admin view)
-   * USER               → /product/user/search?keyword=
-   * USER_TYPE1         → /product/user-type1/categories then featured as fallback;
-   *                      for the full list we use /product/user-type1/featured
-   *                      combined with category search — simplest: reuse user search
-   *                      NOTE: USER_TYPE1 does NOT have /product/user/search access,
-   *                      so we call /product/user-type1/featured for the initial list.
-   * USER_TYPE2         → /product/user-type2/sorted?order=asc  (default sorted list)
-   */
   getProducts: async (rawRole?: string): Promise<{ products: Product[]; statistics?: any }> => {
     const adminRoles = ['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2'];
     const isAdmin = rawRole && adminRoles.includes(rawRole);
@@ -70,15 +56,6 @@ export const productsService = {
     return { products: mapProductList(json) };
   },
 
-  /**
-   * Search products by keyword.
-   * USER               → /product/user/search?keyword=
-   * USER_TYPE1         → /product/user-type1/category (no keyword search endpoint,
-   *                      fallback: filter client-side from featured list)
-   * USER_TYPE2         → /product/user-type2/sorted (no keyword endpoint,
-   *                      filter client-side)
-   * ADMIN*             → /product/admin/all then filter client-side
-   */
   searchProducts: async (keyword: string, rawRole?: string): Promise<Product[]> => {
     const adminRoles = ['ADMIN', 'ADMIN_TYPE1', 'ADMIN_TYPE2'];
 
@@ -110,14 +87,11 @@ export const productsService = {
     return mapProductList(json);
   },
 
-  //Get product by id.
-   // All roles  /product/user/details/{id} 
   getProductById: async (id: string): Promise<Product> => {
     const json = await apiService.get<BackendProduct>(API_ENDPOINTS.PRODUCT_USER_DETAILS(id));
     return mapBackendProduct(json);
   },
 
-  //Create product — POST /product/admin/create (multipart, ADMIN only)
   createProduct: async (formData: ProductFormData, imageFile?: File | null): Promise<Product> => {
     const fd = new FormData();
     const productBlob = new Blob(
@@ -145,8 +119,7 @@ fd.append("product", productBlob);
     return mapBackendProduct(json.product || json);
   },
 
-  //Update product — PUT /product/admin-type2/update-price/{id} (multipart)
-   
+
   updateProduct: async (
   id: string,
   formData: ProductFormData,
@@ -155,7 +128,6 @@ fd.append("product", productBlob);
 
   const fd = new FormData();
 
-  // Send the product as a JSON Blob so Spring can deserialize @RequestPart
   const productBlob = new Blob(
     [
       JSON.stringify({
