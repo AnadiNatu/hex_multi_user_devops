@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// Need to increase the number of custom errors and handle different types of errors like Twillio , OAuth2 and Supabase Exceptions as well .
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

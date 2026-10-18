@@ -25,7 +25,8 @@ public class OAuth2Controller {
 
     private final JwtUtil           jwtUtil;
     private final OAuth2ServiceImpl oauth2Service;
-
+// The "OAuth2Callback" page doesn't use the OAuth2 endpoints that is why its failing
+// The full controller is not used .
     // REST token exchange (optional / fallback)
     @GetMapping("/success")
     @PreAuthorize("isAuthenticated()")

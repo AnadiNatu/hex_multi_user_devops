@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+// Not used but , need to figure out a way to change the types of dashboards for the types of users based on the response of hitting the endpoints of the controller
+// Can make the login chain such that when after login if the user type  is identified the specific endpoint is triggered and depending on the response that particular type of dashboard is rendered
 @RestController
 @RequestMapping("/api/type1")
 @CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})

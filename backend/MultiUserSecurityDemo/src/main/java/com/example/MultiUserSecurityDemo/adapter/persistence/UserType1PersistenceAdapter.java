@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+//Final interview-style answer
+//"Adapters isolate the domain/application layer from external technologies. Ports define what the application
+// needs, while adapters provide the actual implementation using technologies such as JPA repositories or Redis.
+// This reduces coupling and makes infrastructure implementations replaceable without significantly changing business logic."
 @Component
 public class UserType1PersistenceAdapter implements UserType1Port {
 

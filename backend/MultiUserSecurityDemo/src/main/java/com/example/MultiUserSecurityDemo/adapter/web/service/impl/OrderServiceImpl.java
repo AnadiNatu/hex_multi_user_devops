@@ -70,27 +70,18 @@ public class OrderServiceImpl implements OrderService {
                 var productOpt = productPort.findById(itemReq.getProductId());
 
                 if (productOpt.isEmpty()) {
-                    throw new RuntimeException(
-                            "Product not found: " + itemReq.getProductId()
-                    );
+                    throw new RuntimeException("Product not found: " + itemReq.getProductId());
                 }
 
                 var product = productOpt.get();
 
                 if (product.getPrice() == null) {
-                    throw new RuntimeException(
-                            "Product has no price: " + itemReq.getProductId()
-                    );
+                    throw new RuntimeException("Product has no price: " + itemReq.getProductId());
                 }
 
                 BigDecimal unitPrice = product.getPrice();
-
-                BigDecimal subtotal = unitPrice.multiply(
-                        BigDecimal.valueOf(itemReq.getQuantity())
-                );
-
+                BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
                 OrderItem item = new OrderItem();
-
                 item.setOrder(order);
                 item.setProductId(product.getId());
                 item.setProductName(product.getName());
@@ -102,34 +93,16 @@ public class OrderServiceImpl implements OrderService {
 
                 total = total.add(subtotal);
             }
-
             order.setItems(orderItems);
             order.setTotalAmount(total);
-
             Order savedOrder = orderPort.save(order);
-
             invalidateOrderCreateCache(userEmail);
 
-            log.info(
-                    "[createOrder] SUCCESS | id={} | items={} | total={}",
-                    savedOrder.getId(),
-                    orderItems.size(),
-                    total
-            );
-
+            log.info("[createOrder] SUCCESS | id={} | items={} | total={}", savedOrder.getId(), orderItems.size(), total);
             return toResponse(savedOrder);
-
         } catch (Exception e) {
-            log.error(
-                    "[createOrder] FAILED | userEmail={}",
-                    userEmail,
-                    e
-            );
-
-            throw new RuntimeException(
-                    "Failed to create order: " + e.getMessage(),
-                    e
-            );
+            log.error("[createOrder] FAILED | userEmail={}", userEmail, e);
+            throw new RuntimeException("Failed to create order: " + e.getMessage(), e);
         }
     }
 

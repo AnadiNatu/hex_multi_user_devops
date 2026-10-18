@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 //import java.util.logging.Logger;
-
+// Need to use supabase for the profile photos as well .
 @RestController
 @RequestMapping("/api/profile/")
 @CrossOrigin(origins = {"http://localhost:5173","http://localhost:4200"})

@@ -56,14 +56,12 @@ public class AuthController {
         }
 
         if (request.getPassword() == null || request.getPassword().isEmpty()){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(SignUpResponse.builder().message("Password is required").build());
         }
 
         if (request.getUserType() == null || request.getUserType().isEmpty()){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(SignUpResponse.builder().message("User Type is Required (TYPE1 or TYPE2)").build());
         }
 
@@ -97,7 +95,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(username, password));
             UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
-            String token        = jwtUtil.generateToken(userDetails);
+            String token = jwtUtil.generateToken(userDetails);
             String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername());
 
             if (userDetails instanceof UserType1Details d) {

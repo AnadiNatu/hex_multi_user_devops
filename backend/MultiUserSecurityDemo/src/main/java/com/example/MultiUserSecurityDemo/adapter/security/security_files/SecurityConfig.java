@@ -55,8 +55,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
 
                         // PUBLIC ENDPOINTS
@@ -129,8 +128,8 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/oauth2/authorization"))
-                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/"))
+                        .authorizationEndpoint(endpoint ->
+                                endpoint.baseUri("/oauth2/authorization"))
                         .successHandler(oAuth2SuccessHandler)
                         .failureUrl(frontendUrl + "/oauth2/callback?error=oauth2_failed"))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request ,response , authException) -> {

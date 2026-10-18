@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 //import java.util.logging.Logger;
 
+// Need to make the UI of the emails more professional
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -59,15 +60,6 @@ public class EmailService {
         log.info("OTP validation | email={} | valid={}" , email , valid);
         return valid;
     }
-
-//    public void sendWelcomeEmail(String toEmail , String firstName){
-//        String subject = "Welcome to MultiUser Platform";
-//        String body = "<h2>Hi " + firstName + ",</h2>"
-//                + "<p>Your account has been successfully created.</p>"
-//                + "<p>You can now log in and explore the platform.</p>"
-//                + "<br/><p>Regards,<br/>The MultiUser Team</p>";
-//        sendEmail(toEmail, subject, body, true);
-//    }
 
     private String buildOtpEmailBody(String otp) {
         return "<div style='font-family:Arial,sans-serif;max-width:480px;margin:auto;'>"

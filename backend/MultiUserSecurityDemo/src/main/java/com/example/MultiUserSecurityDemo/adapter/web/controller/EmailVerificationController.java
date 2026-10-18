@@ -22,7 +22,7 @@ public class EmailVerificationController {
     private final UserType2Port userType2Port;
 
     // ── Verify email via OTP ───────────────────────────────────────────────
-
+// Not used
     @PostMapping("/verify-email")
     public ResponseEntity<Map<String, Object>> verifyEmail(
             @RequestParam String email,
@@ -70,7 +70,7 @@ public class EmailVerificationController {
     }
 
     // ── Resend verification OTP ────────────────────────────────────────────
-
+// Not used
     @PostMapping("/resend-verification")
     public ResponseEntity<Map<String, Object>> resendVerification(@RequestParam String email) {
         log.info("[EMAIL_VERIFY] Resend requested | email={}", email);

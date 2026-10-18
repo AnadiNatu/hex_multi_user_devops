@@ -20,8 +20,7 @@ public class RedisCacheAdapter implements CachePort {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    // ==================== SINGLE OBJECT OPERATIONS ====================
-
+    // SINGLE OBJECT OPERATIONS
     @Override
     public Optional<Object> get(String key) {
         try {
@@ -82,7 +81,7 @@ public class RedisCacheAdapter implements CachePort {
             return Optional.of(value);
         } catch (Exception e) {
             log.error("Error getting list from cache for key: {}", key, e);
-            return Optional.empty(); // Graceful fallback
+            return Optional.empty();
         }
     }
 
@@ -110,7 +109,7 @@ public class RedisCacheAdapter implements CachePort {
         return set(key, value, Duration.ofMinutes(30));
     }
 
-    // ==================== DELETE OPERATIONS ====================
+    // DELETE OPERATIONS
     @Override
     public boolean delete(String key) {
         try {
@@ -172,7 +171,7 @@ public class RedisCacheAdapter implements CachePort {
         }
     }
 
-    // ==================== CHECK OPERATIONS ====================
+    // CHECK OPERATIONS
     @Override
     public boolean exists(String key) {
         try {
@@ -217,7 +216,7 @@ public class RedisCacheAdapter implements CachePort {
         }
     }
 
-    // ==================== UTILITY OPERATIONS ====================
+    // UTILITY OPERATIONS
     @Override
     public long flushAll() {
         try {
@@ -290,5 +289,4 @@ public class RedisCacheAdapter implements CachePort {
             return 0;
         }
     }
-
 }

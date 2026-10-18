@@ -52,7 +52,7 @@ public class CacheKeyConstants {
         return PRODUCT_PREFIX + ":compare:" + String.join(":", ids.stream().map(String::valueOf).toArray(String[]::new));
     }
 
-    // ==================== Category Cache Keys ====================
+    // Category Cache Keys
     public static final String CATEGORY_PREFIX = "category";
 
     // All categories: category:list
@@ -61,7 +61,7 @@ public class CacheKeyConstants {
     // Category counts: category:counts
     public static final String CATEGORY_COUNTS_KEY = CATEGORY_PREFIX + ":counts";
 
-    // ==================== Statistics Cache Keys ====================
+    // Statistics Cache Keys
     public static final String STATS_PREFIX = "stats";
 
     // Product statistics: stats:product
@@ -72,7 +72,7 @@ public class CacheKeyConstants {
         return String.format("%s:category-price:%s", STATS_PREFIX, category);
     }
 
-    // ==================== Order Cache Keys ====================
+    // Order Cache Keys
     public static final String ORDER_PREFIX = "order";
 
     // Order by ID: order:123
@@ -93,7 +93,7 @@ public class CacheKeyConstants {
         return String.format("%s:user:%s", ORDER_PREFIX, userId);
     }
 
-    // ==================== User Cache Keys ====================
+    // User Cache Keys
     public static final String USER_PREFIX = "user";
 
     // User by ID: user:123
@@ -109,7 +109,7 @@ public class CacheKeyConstants {
     // All users (use with caution): user:all
     public static final String USER_ALL_KEY = USER_PREFIX + ":all";
 
-    // ==================== Pattern Keys (for invalidation/scanning) ====================
+    // Pattern Keys (for invalidation/scanning)
 
     // Invalidate all product cache: product:*
     public static final String PRODUCT_PATTERN = PRODUCT_PREFIX + ":*";
@@ -126,7 +126,7 @@ public class CacheKeyConstants {
     // Invalidate all user cache: user:*
     public static final String USER_PATTERN = USER_PREFIX + ":*";
 
-    // ==================== Cache TTL Configuration ====================
+    // Cache TTL Configuration
     // Organized by data volatility
 
     public static class CacheTTL {
@@ -163,7 +163,7 @@ public class CacheKeyConstants {
         public static final Duration USER_ALL = Duration.ofMinutes(60);           // Rarely cached
     }
 
-    // ==================== Cache Invalidation Strategy ====================
+    // Cache Invalidation Strategy
     public static class InvalidationPatterns {
 
         // Product creation invalidates
@@ -206,7 +206,7 @@ public class CacheKeyConstants {
         }
     }
 
-    // ==================== Helper Methods ====================
+    // Helper Methods
     public static String[] getAllPatterns() {
         return new String[]{
                 PRODUCT_PATTERN,

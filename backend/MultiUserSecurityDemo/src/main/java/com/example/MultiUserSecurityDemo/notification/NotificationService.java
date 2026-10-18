@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+// Need to make the UI of the notification content more professional
 @Service
 @RequiredArgsConstructor
 public class NotificationService {

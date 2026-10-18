@@ -11,6 +11,11 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+// In microservice
+// In a production microservice environment, you would typically use service discovery
+// so that the Load Balancer can dynamically discover which instances are currently running
+// instead of manually maintaining this list.
+
 @Configuration
 public class LoadBalancerConfig {
 

@@ -127,6 +127,7 @@ public class ProductController{
         return ResponseEntity.ok(response);
     }
 
+    // Not used
     @PutMapping("/admin-type1/bulk-update-stock")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE1')")
     public ResponseEntity<?> adminType1BulkUpdateStock(@RequestBody Map<Long, Integer> stockUpdates , @AuthenticationPrincipal UserDetails userDetails) {
@@ -250,7 +251,6 @@ public class ProductController{
     }
 
 //    (Admin + Admin1) & (User + User1)
-
     @GetMapping("/user/details/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE1', 'USER', 'USER_TYPE1')")
     public ResponseEntity<?> userViewProductDetails(@PathVariable Long id) {

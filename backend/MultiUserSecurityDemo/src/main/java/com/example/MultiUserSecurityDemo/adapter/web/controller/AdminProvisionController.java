@@ -33,10 +33,7 @@ public class AdminProvisionController {
     private final UserType2Port userType2Port;
     private final EmailService emailService;
 
-    // ═══════════════════════════════════════════════════════════════════════
     //  ADMIN-ONLY: create + approve TYPE1 users (ADMIN1 / ADMIN2)
-    // ═══════════════════════════════════════════════════════════════════════
-
     @PostMapping("/admin-user")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<SignUpResponse> createAdminUser(
@@ -50,9 +47,7 @@ public class AdminProvisionController {
         // Enforce allowed roles for this tier
         if (!isAllowedAdminRole(request.getRole())) {
             return ResponseEntity.badRequest().body(
-                    SignUpResponse.builder()
-                            .message("ADMIN can only create ADMIN_TYPE1 or ADMIN_TYPE2 accounts. Got: " + request.getRole())
-                            .build());
+                    SignUpResponse.builder().message("ADMIN can only create ADMIN_TYPE1 or ADMIN_TYPE2 accounts. Got: " + request.getRole()).build());
         }
 
         request.setUserType("TYPE1");
@@ -71,7 +66,6 @@ public class AdminProvisionController {
 
             // Send invitation email
             sendInvitationEmail(request.getEmail(), request.getFname(), callerEmail, request.getRole());
-
             response.setMessage("Admin user created and pre-approved. A verification email has been sent.");
         }
 
@@ -81,30 +75,20 @@ public class AdminProvisionController {
 
     @PostMapping("/approve/type1/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Map<String, Object>> approveType1User(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserType1Details caller) {
+    public ResponseEntity<Map<String, Object>> approveType1User(@PathVariable Long id, @AuthenticationPrincipal UserType1Details caller) {
 
         log.info("[PROVISION] ADMIN approving TYPE1 id={} | by={}", id, caller.getUsername());
-
         return userType1Port.findById(id)
                 .map(u -> {
                     if (u.isApproved()) {
-                        return ResponseEntity.ok(Map.<String, Object>of(
-                                "message", "User is already approved.",
-                                "userId", id
-                        ));
+                        return ResponseEntity.ok(Map.<String, Object>of("message", "User is already approved.", "userId", id));
                     }
                     u.setApproved(true);
                     userType1Port.save(u);
 
                     // Notify the user
                     try {
-                        emailService.sendHtmlEmail(
-                                u.getEmail(),
-                                "Your account has been approved",
-                                buildApprovalEmailBody(u.getFname(), u.getRoles1().name())
-                        );
+                        emailService.sendHtmlEmail(u.getEmail(), "Your account has been approved", buildApprovalEmailBody(u.getFname(), u.getRoles1().name()));
                     } catch (Exception ex) {
                         log.warn("[PROVISION] Approval email failed | email={}", u.getEmail());
                     }
@@ -117,8 +101,7 @@ public class AdminProvisionController {
                             "role", u.getRoles1().name()
                     ));
                 })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "TYPE1 user not found with id=" + id)));
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "TYPE1 user not found with id=" + id)));
     }
 
     @GetMapping("/pending/type1")
@@ -140,9 +123,7 @@ public class AdminProvisionController {
         return ResponseEntity.ok(pending);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
     //  ADMIN2-ONLY: create + approve TYPE2 users (USER1 / USER2)
-    // ═══════════════════════════════════════════════════════════════════════
     @PostMapping("/user")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE2')")
     public ResponseEntity<SignUpResponse> createUser(
@@ -183,9 +164,7 @@ public class AdminProvisionController {
         return ResponseEntity.status(status).body(response);
     }
 
-    /**
-     * ADMIN or ADMIN_TYPE2 approves a pending TYPE2 account.
-     */
+    //ADMIN or ADMIN_TYPE2 approves a pending TYPE2 account.
     @PostMapping("/approve/type2/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE2')")
     public ResponseEntity<Map<String, Object>> approveType2User(
@@ -197,20 +176,13 @@ public class AdminProvisionController {
         return userType2Port.findById(id)
                 .map(u -> {
                     if (u.isApproved()) {
-                        return ResponseEntity.ok(Map.<String, Object>of(
-                                "message", "User is already approved.",
-                                "userId", id
-                        ));
+                        return ResponseEntity.ok(Map.<String, Object>of("message", "User is already approved.", "userId", id));
                     }
                     u.setApproved(true);
                     userType2Port.save(u);
 
                     try {
-                        emailService.sendHtmlEmail(
-                                u.getEmail(),
-                                "Your account has been approved",
-                                buildApprovalEmailBody(u.getFname(), u.getRole().name())
-                        );
+                        emailService.sendHtmlEmail(u.getEmail(), "Your account has been approved", buildApprovalEmailBody(u.getFname(), u.getRole().name()));
                     } catch (Exception ex) {
                         log.warn("[PROVISION] Approval email failed | email={}", u.getEmail());
                     }
@@ -268,9 +240,7 @@ public class AdminProvisionController {
                         .body(Map.of("message", "TYPE1 user not found with id=" + id)));
     }
 
-    /**
-     * ADMIN or ADMIN_TYPE2 triggers a password-reset OTP for any TYPE2 user by id.
-     */
+    //ADMIN or ADMIN_TYPE2 triggers a password-reset OTP for any TYPE2 user by id.
     @PostMapping("/reset-password/type2/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'ADMIN_TYPE2')")
     public ResponseEntity<Map<String, Object>> adminTriggerPasswordResetType2(
@@ -288,8 +258,7 @@ public class AdminProvisionController {
                             "userId", id
                     ));
                 })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "TYPE2 user not found with id=" + id)));
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "TYPE2 user not found with id=" + id)));
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

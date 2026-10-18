@@ -87,7 +87,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-
+// Need to remove the cache , as it will conflict with the redis implementation.
     @Override
     @Caching(
             evict = {
@@ -155,12 +155,12 @@ public class ProductServiceImpl implements ProductService {
             // 1️ - Try Cache First (fastest path)
             Optional<ProductResponse> cachedProduct = cachePort.getSingle(cacheKey , ProductResponse.class);
             if (cachedProduct.isPresent()) {
-                log.trace("✓ Cache HIT for product ID: {}", id);
+                log.trace("Cache HIT for product ID: {}", id);
                 return cachedProduct.get();
             }
 
             // 2 - CACHE MISS: Query database
-            log.trace("✗ Cache MISS for product ID: {}, querying database", id);
+            log.trace("Cache MISS for product ID: {}, querying database", id);
             Optional<Product> product = productPort.findById(id);
 
             if (product.isEmpty()) {
@@ -176,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
             if (!cached) {
                 log.warn("Failed to cache product ID: {}, but continuing with DB result", id);
             } else {
-                log.trace("✓ Cached product ID: {} with TTL: 24 hours", id);
+                log.trace("Cached product ID: {} with TTL: 24 hours", id);
             }
 
             return response;
@@ -198,12 +198,12 @@ public class ProductServiceImpl implements ProductService {
                     cachePort.getList(CacheKeyConstants.PRODUCT_ALL_KEY);
 
             if (cachedProducts.isPresent()) {
-                log.trace("✓ Cache HIT for all products");
+                log.trace("Cache HIT for all products");
                 return (List<ProductResponse>)  cachedProducts.get();
             }
 
             // 2️ - Cache Miss: Query database
-            log.trace("✗ Cache MISS for all products, querying database");
+            log.trace("Cache MISS for all products, querying database");
             List<Product> products = productPort.findAll();
             List<ProductResponse> responses = products.stream()
                     .map(mapper::mapToResponse)
@@ -212,7 +212,7 @@ public class ProductServiceImpl implements ProductService {
             // 3️ - Cache The Result
             cachePort.set(CacheKeyConstants.PRODUCT_ALL_KEY, responses, CacheKeyConstants.CacheTTL.PRODUCT_ALL);
 
-            log.trace("✓ Cached all products ({} items) with TTL: 30 minutes", responses.size());
+            log.trace("Cached all products ({} items) with TTL: 30 minutes", responses.size());
             return responses;
 
         } catch (Exception e) {
@@ -246,12 +246,12 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for category: {}", category);
+                log.trace("Cache HIT for category: {}", category);
                 return (List<ProductResponse>) cached.get();
             }
 
             // 2️ - Cache Miss: Query database
-            log.trace("✗ Cache MISS for category: {}", category);
+            log.trace("Cache MISS for category: {}", category);
             List<Product> products = productPort.findByCategory(category);
             List<ProductResponse> responses = products.stream()
                     .map(mapper::mapToResponse)
@@ -295,7 +295,7 @@ public class ProductServiceImpl implements ProductService {
             // 3️ - invalidate cache
             invalidateProductDeleteCache(id, category);
 
-            log.info("✓ Product ID: {} deleted", id);
+            log.info("Product ID: {} deleted", id);
 
         } catch (Exception e) {
             log.error("Error deleting product", e);
@@ -343,11 +343,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(CacheKeyConstants.PRODUCT_STATS_KEY);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for product statistics");
+                log.trace("Cache HIT for product statistics");
                 return (Map<String, Object>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for product statistics");
+            log.trace("Cache MISS for product statistics");
 
             List<Product> allProducts = productPort.findAll();
 
@@ -428,11 +428,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.get(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for low stock products");
+                log.trace("Cache HIT for low stock products");
                 return (List<ProductResponse>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for low stock products");
+            log.trace("Cache MISS for low stock products");
 
             List<Product> lowStock = productPort.findAll().stream()
                     .filter(p -> p.getStockQuantity() < threshold)
@@ -498,11 +498,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for category price analysis: {}", category);
+                log.trace("Cache HIT for category price analysis: {}", category);
                 return (Map<String, Object>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for category price analysis: {}", category);
+            log.trace("Cache MISS for category price analysis: {}", category);
 
             List<Product> categoryProducts = productPort.findByCategory(category);
 
@@ -578,11 +578,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for search: {}", keyword);
+                log.trace("Cache HIT for search: {}", keyword);
                 return (List<ProductResponse>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for search: {}", keyword);
+            log.trace("Cache MISS for search: {}", keyword);
 
             // Search using database
             List<Product> products = productPort.findAll().stream()
@@ -619,11 +619,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.get(CacheKeyConstants.CATEGORY_ALL_KEY);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for all categories");
+                log.trace("Cache HIT for all categories");
                 return (List<String>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for all categories");
+            log.trace("Cache MISS for all categories");
 
             List<String> categories = productPort.findAll().stream()
                     .map(Product::getCategory)
@@ -656,11 +656,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(CacheKeyConstants.CATEGORY_COUNTS_KEY);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for category counts");
+                log.trace("Cache HIT for category counts");
                 return (Map<String, Long>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for category counts");
+            log.trace("Cache MISS for category counts");
 
             Map<String, Long> counts = productPort.findAll().stream()
                     .collect(Collectors.groupingByConcurrent(Product::getCategory, Collectors.counting()));
@@ -686,11 +686,11 @@ public class ProductServiceImpl implements ProductService {
             Optional<Object> cached = cachePort.getList(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for active products in category: {}", category);
+                log.trace("Cache HIT for active products in category: {}", category);
                 return (List<ProductResponse>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for active products in category: {}", category);
+            log.trace("Cache MISS for active products in category: {}", category);
             List<Product> products = productPort.findByCategory(category).stream()
                     .filter(p -> p.getIsActive() != null && p.getIsActive())
                     .collect(Collectors.toList());
@@ -850,11 +850,11 @@ public class ProductServiceImpl implements ProductService {
                     cachePort.getList(cacheKey);
 
             if (cached.isPresent()) {
-                log.trace("✓ Cache HIT for product comparison");
+                log.trace("Cache HIT for product comparison");
                 return (List<ProductResponse>) cached.get();
             }
 
-            log.trace("✗ Cache MISS for product comparison");
+            log.trace("Cache MISS for product comparison");
 
             List<ProductResponse> responses = productIds.stream()
                     .map(productPort::findById)
@@ -878,7 +878,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void invalidateProductCreateCache() {
-        log.debug("🗑️ Invalidating cache after product creation");
+        log.debug("Invalidating cache after product creation");
 
         String[] patterns = CacheKeyConstants.InvalidationPatterns.PRODUCT_CREATE_INVALIDATE;
         for (String pattern : patterns) {
@@ -893,7 +893,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void invalidateProductUpdateCache(Long productId, String category) {
-        log.debug("🗑️ Invalidating cache after product update for ID: {}", productId);
+        log.debug("Invalidating cache after product update for ID: {}", productId);
 
         String[] patterns = CacheKeyConstants.InvalidationPatterns.getProductUpdateInvalidate(productId, category);
         for (String pattern : patterns) {
@@ -908,7 +908,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void invalidateProductDeleteCache(Long productId, String category) {
-        log.debug("🗑️ Invalidating cache after product deletion for ID: {}", productId);
+        log.debug("Invalidating cache after product deletion for ID: {}", productId);
 
         String[] patterns = CacheKeyConstants.InvalidationPatterns.getProductDeleteInvalidate(productId, category);
         for (String pattern : patterns) {
@@ -923,7 +923,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void invalidateStockUpdateCache(Long productId) {
-        log.debug("🗑️ Invalidating cache after stock update for product ID: {}", productId);
+        log.debug("Invalidating cache after stock update for product ID: {}", productId);
 
         String[] patterns = CacheKeyConstants.InvalidationPatterns.getStockUpdateInvalidate(productId);
         for (String pattern : patterns) {
