@@ -182,11 +182,13 @@ export const API_ENDPOINTS = {
   // Profile
   PROFILE_PHOTO: '/profile/photo',
    // ── Admin Provision (ADMIN only) ──────────────────────────────────────────
-  PROVISION_CREATE_ADMIN:    '/admin/provision/admin-user',
+  //  Need to use these ones
+   PROVISION_CREATE_ADMIN:    '/admin/provision/admin-user',
   PROVISION_PENDING_TYPE1:   '/admin/provision/pending/type1',
   PROVISION_APPROVE_TYPE1:   (id: number) => `/admin/provision/approve/type1/${id}`,
   PROVISION_RESET_TYPE1:     (id: number) => `/admin/provision/reset-password/type1/${id}`,
   // ── User Provision (ADMIN + ADMIN_TYPE2) ──────────────────────────────────
+  // Need to use these ones as well 
   PROVISION_CREATE_USER:     '/admin/provision/user',
   PROVISION_PENDING_TYPE2:   '/admin/provision/pending/type2',
   PROVISION_APPROVE_TYPE2:   (id: number) => `/admin/provision/approve/type2/${id}`,
@@ -199,10 +201,12 @@ export const API_ENDPOINTS = {
   PRODUCT_AT1_UPDATE_STOCK: (id: string) => `/product/admin-type1/update-stock/${id}`,
   PRODUCT_AT1_LOW_STOCK: '/product/admin-type1/low-stock',
   // Products — ADMIN_TYPE2
+  // Wrong endpoint created in here
   PRODUCT_AT2_UPDATE_PRICE: (id: string) => `/product/admin-type2/update-price/${id}`,
   PRODUCT_AT2_CATEGORY: (cat: string) => `/product/admin-type2/category/${cat}`,
   PRODUCT_AT2_TOGGLE_ACTIVE: (id: string) => `/product/admin-type2/toggle-active/${id}`,
   // Products — USER (basic)
+  // Need to use this one as well . 
   PRODUCT_USER_SEARCH: '/product/user/search',
   PRODUCT_USER_DETAILS: (id: string) => `/product/user/details/${id}`,
   // Products — USER_TYPE1
