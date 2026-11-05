@@ -23,17 +23,24 @@ public class CompositeUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user1 = userType1Port.findByEmail(username);
+        String normalizedEmail = normalizeEmail(username);
+        var user1 = userType1Port.findByEmail(normalizedEmail);
         if (user1.isPresent()){
             return new UserType1Details(user1.get());
         }
 
-        var user2 = userType2Port.findByEmail(username);
+        var user2 = userType2Port.findByEmail(normalizedEmail);
         if (user2.isPresent()){
             return new UserType2Details(user2.get());
         }
 
         throw new UsernameNotFoundException("User not found: " + username);
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null
+                ? null
+                : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 }
 

@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
             UserType1 user = new UserType1();
             user.setFname(request.getFname());
             user.setLname(request.getLname());
-            user.setEmail(request.getEmail());
+            user.setEmail(normalizeEmail(request.getEmail()));
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setPhoneNumber(request.getPhoneNumber());
             user.setRoles1(parseUserRole1(request.getRole()));
@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
             UserType2 user = new UserType2();
             user.setFname(request.getFname());
             user.setLname(request.getLname());
-            user.setEmail(request.getEmail());
+            user.setEmail(normalizeEmail(request.getEmail()));
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setPhoneNumber(request.getPhoneNumber());
             user.setRole(parseUserRoles2(request.getRole()));
@@ -162,5 +162,11 @@ public class AuthServiceImpl implements AuthService {
             log.warn("[parseUserRole2] Unknown role '{}', defaulting to ADMIN_TYPE2", roleString);
             return UserRoles2.USER_TYPE2;
         }
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null
+                ? null
+                : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 }

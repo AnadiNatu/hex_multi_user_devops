@@ -49,34 +49,34 @@ export interface ResendVerifyResponse {
 
 export const provisionService = {
   createAdminUser: (data: ProvisionUserRequest): Promise<ProvisionResponse> =>
-    apiService.post('/api/admin/provision/admin-user', data),
+    apiService.post('/admin/provision/admin-user', data),
 
   getPendingType1: (): Promise<PendingUser[]> =>
-    apiService.get('/api/admin/provision/pending/type1'),
+    apiService.get('/admin/provision/pending/type1'),
 
   approveType1: (id: number): Promise<ApprovalResponse> =>
-    apiService.post(`/api/admin/provision/approve/type1/${id}`),
+    apiService.post(`/admin/provision/approve/type1/${id}`),
 
   resetPasswordType1: (id: number): Promise<PasswordResetResponse> =>
-    apiService.post(`/api/admin/provision/reset-password/type1/${id}`),
+    apiService.post(`/admin/provision/reset-password/type1/${id}`),
 
   createUser: (data: ProvisionUserRequest): Promise<ProvisionResponse> =>
-    apiService.post('/api/admin/provision/user', data),
+    apiService.post('/admin/provision/user', data),
 
   getPendingType2: (): Promise<PendingUser[]> =>
-    apiService.get('/api/admin/provision/pending/type2'),
+    apiService.get('/admin/provision/pending/type2'),
 
   approveType2: (id: number): Promise<ApprovalResponse> =>
-    apiService.post(`/api/admin/provision/approve/type2/${id}`),
+    apiService.post(`/admin/provision/approve/type2/${id}`),
 
   resetPasswordType2: (id: number): Promise<PasswordResetResponse> =>
-    apiService.post(`/api/admin/provision/reset-password/type2/${id}`),
+    apiService.post(`/admin/provision/reset-password/type2/${id}`),
 };
 
 export const emailVerifyService = {
   verifyEmail: (email: string, otp: string): Promise<EmailVerifyResponse> =>
-    apiService.postQuery('/api/auth/verify-email', { email, otp }),
+    apiService.postQuery('/auth/verify-email', { email, otp }),
 
   resendVerification: (email: string): Promise<ResendVerifyResponse> =>
-    apiService.postQuery('/api/auth/resend-verification', { email }),
+    apiService.postQuery('/auth/resend-verification', { email }),
 };

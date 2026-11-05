@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserType1Repository extends JpaRepository<UserType1Entity , Long> {
     Optional<UserType1Entity> findByEmail(String email);
+    Optional<UserType1Entity> findByEmailIgnoreCase(String email);
     Optional<UserType1Entity> findByPhoneNumber(String phone);
     List<UserType1Entity> findByIsApprovedFalse();
 }

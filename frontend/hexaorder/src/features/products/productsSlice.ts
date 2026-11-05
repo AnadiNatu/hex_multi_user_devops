@@ -93,19 +93,51 @@ export const createProduct = createAsyncThunk<
   }
 });
 
+// export const updateProduct = createAsyncThunk<
+//   Product,
+//   { id: string; formData: ProductFormData; imageFile?: File | null },
+//   { rejectValue: string }
+// >('products/updateProduct', async ({ id, formData, imageFile }, { rejectWithValue }) => {
+//   try {
+//     return await productsService.updateProduct(id, formData, imageFile);
+//   } catch (error) {
+//     return rejectWithValue(
+//       error instanceof Error ? error.message : 'Unable to update product'
+//     );
+//   }
+// });
+
 export const updateProduct = createAsyncThunk<
   Product,
-  { id: string; formData: ProductFormData; imageFile?: File | null },
+  {
+    id: string;
+    formData: ProductFormData;
+    imageFile?: File | null;
+    removeExistingImage?: boolean;
+  },
   { rejectValue: string }
->('products/updateProduct', async ({ id, formData, imageFile }, { rejectWithValue }) => {
-  try {
-    return await productsService.updateProduct(id, formData, imageFile);
-  } catch (error) {
-    return rejectWithValue(
-      error instanceof Error ? error.message : 'Unable to update product'
-    );
+>(
+  'products/updateProduct',
+  async (
+    { id, formData, imageFile, removeExistingImage = false },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await productsService.updateProduct(
+        id,
+        formData,
+        imageFile,
+        removeExistingImage
+      );
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : 'Unable to update product'
+      );
+    }
   }
-});
+);
 
 export const deleteProduct = createAsyncThunk<
   string,

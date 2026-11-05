@@ -25,28 +25,42 @@ export const loginUser = createAsyncThunk<
   { rejectValue: string }
 >('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
-    // 1. Login → user with token + rawRole from response
-    const user = await authService.login(credentials.email, credentials.password);
+    // 1. Login response is the authoritative identity.
+    const user = await authService.login(
+      credentials.email,
+      credentials.password
+    );
 
-    // 2. Enrich with /me data (profilePicture, phoneNumber etc.) but keep rawRole from login
+    // 2. Fetch only supplementary profile information.
     const meData = await authService.fetchMe();
 
-    // rawRole from login response is authoritative; don't let /me overwrite it
-    // unless /me also returns a role (it does in our fixed backend).
+    // 3. Preserve identity and role from the login response.
     const merged: User = {
       ...user,
       ...meData,
-      // Ensure critical identity fields from login are kept
-      token:    user.token,
-      rawRole:  meData.rawRole || user.rawRole,
-      role:     meData.role    || user.role,
-      userType: meData.userType || user.userType,
+
+      id: user.id,
+      name: user.name,
+      email: user.email,
+
+      role: user.role,
+      rawRole: user.rawRole,
+      userType: user.userType,
+
+      token: user.token,
     };
 
+    // 4. Persist the corrected session.
     authService.storeUser(merged);
+
     return merged;
+
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unable to log in';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Unable to log in';
+
     return rejectWithValue(message);
   }
 });

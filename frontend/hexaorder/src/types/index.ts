@@ -70,6 +70,8 @@ export interface LoginResponse {
   userId?: number;
   fname?: string;
   lname?: string;
+  firstName?: string;
+  lastName?: string;
   profilePicture?: string;
   phoneNumber?: string;
   email : string;

@@ -17,5 +17,6 @@ public class ProductRequest {
     private String category;
     private String imageUrl;
     private Boolean isActive;
+    private Boolean removeImage = false;
 
 }

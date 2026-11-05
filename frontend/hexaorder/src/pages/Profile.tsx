@@ -129,7 +129,7 @@ export default function Profile() {
       <Breadcrumb items={[{ label: 'Profile' }]} />
 
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Profile Settings</h1>
+        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight" style={{ color: '#329330' }}>Profile Settings</h1>
         <p className="text-sm text-slate-500 mt-1">Manage your account information and security preferences.</p>
       </div>
 
@@ -216,7 +216,7 @@ export default function Profile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Full Name"      name="name"    value={formData.name}    onChange={(e) => setFormData({ ...formData, name:    e.target.value })} leftIcon={<User    className="w-4 h-4" />} disabled={!isEditing} required />
                 <Input label="Email Address"  name="email"   type="email" value={formData.email}   onChange={(e) => setFormData({ ...formData, email:   e.target.value })} leftIcon={<Mail    className="w-4 h-4" />} disabled={!isEditing} required />
-                <Input label="Phone Number"   name="phone"   type="tel"   value={formData.phone}   onChange={(e) => setFormData({ ...formData, phone:   e.target.value })} leftIcon={<Phone   className="w-4 h-4" />} disabled={!isEditing} placeholder="+91 9876543210" />
+                <Input label="Phone Number"   name="phone"   type="tel"   value={formData.phone}   onChange={(e) => setFormData({ ...formData, phone:   e.target.value })} leftIcon={<Phone   className="w-4 h-4" />} disabled={!isEditing} placeholder="+91 9XXXX-9XXXX"/>
                 <Input label="Address"        name="address"              value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} leftIcon={<MapPin  className="w-4 h-4" />} disabled={!isEditing} placeholder="City, State" />
               </div>
               <div className="flex gap-2.5 pt-1">

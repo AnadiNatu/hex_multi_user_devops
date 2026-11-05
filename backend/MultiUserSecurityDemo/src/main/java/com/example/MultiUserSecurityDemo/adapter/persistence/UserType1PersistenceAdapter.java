@@ -27,7 +27,11 @@ public class UserType1PersistenceAdapter implements UserType1Port {
 
     @Override
     public Optional<UserType1> findByEmail(String email) {
-        return repository.findByEmail(email)
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
+        return repository.findByEmailIgnoreCase(email.trim())
                 .map(mapper::toDomain);
     }
 

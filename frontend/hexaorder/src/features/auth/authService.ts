@@ -21,30 +21,45 @@ export function mapRole(rawRole: string): 'ADMIN' | 'USER' {
 
 // LOGIN RESPONSE → USER
 export function mapLoginResponseToUser(json: LoginResponse): User {
-  // Backend now sends firstName + lastName (from AuthController fix).
-  // Fall back gracefully if an older build sends only username.
-  const firstName =  json.fname || json.firstname ||'';
-  const lastName  = json.lname  || json.lastname || '';
-  const fullName  = firstName && lastName
-    ? `${firstName} ${lastName}`.trim()
-    : firstName || json.username || json.email || '';
- 
+  const firstName =
+    json.firstName ||
+    json.fname ||
+    json.firstname ||
+    '';
+
+  const lastName =
+    json.lastName ||
+    json.lname ||
+    json.lastname ||
+    '';
+
+  const fullName =
+    `${firstName} ${lastName}`.trim() ||
+    json.username ||
+    json.email ||
+    '';
+
   const rawRole = (json.role || 'USER_TYPE2') as RawRole;
- 
+
   return {
-    id:             json.userId ? String(json.userId) : (json.username || json.email || ''),
-    name:           fullName,
-    email:          json.email || json.username || '',
-    role:           mapRole(rawRole),   // 'ADMIN' | 'USER' — for legacy guards
-    rawRole,                            // 'ADMIN_TYPE1' etc. — for navbar + route guards
-    userType:       (json.userType || 'TYPE2') as UserType,
-    avatarUrl:      json.profilePicture || '',
-    avatar:         json.profilePicture || '',
-    token:          json.token,
-    phoneNumber:    json.phoneNumber,
+    id: json.userId
+      ? String(json.userId)
+      : (json.username || json.email || ''),
+
+    name: fullName,
+    email: json.email || json.username || '',
+    role: mapRole(rawRole),
+    rawRole,
+    userType: (json.userType || 'TYPE2') as UserType,
+
+    avatarUrl: json.profilePicture || '',
+    avatar: json.profilePicture || '',
+    token: json.token,
+    phoneNumber: json.phoneNumber,
     profilePicture: json.profilePicture,
-    createdAt:      new Date().toISOString(),
-    updatedAt:      new Date().toISOString(),
+
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 }
 

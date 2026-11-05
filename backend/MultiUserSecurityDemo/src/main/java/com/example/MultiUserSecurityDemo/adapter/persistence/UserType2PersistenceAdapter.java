@@ -23,7 +23,11 @@ public class UserType2PersistenceAdapter implements UserType2Port {
 
     @Override
     public Optional<UserType2> findByEmail(String email) {
-        return repository.findByEmail(email)
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
+        return repository.findByEmailIgnoreCase(email.trim())
                 .map(mapper::toDomain);
     }
 

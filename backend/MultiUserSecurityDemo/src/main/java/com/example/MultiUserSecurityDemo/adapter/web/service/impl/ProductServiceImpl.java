@@ -117,20 +117,32 @@ public class ProductServiceImpl implements ProductService {
             product.setUpdatedBy(updatedBy);
 
             String oldCategory = product.getCategory();
+            String existingImageUrl = product.getImageUrl();
 
             if (image != null && !image.isEmpty()) {
-                // Delete old image first
-                if (product.getImageUrl() != null && !product.getImageUrl().isBlank()) {
-                    String publicId = cloudinaryService.extractPublicId(product.getImageUrl());
+                // Replace existing image with the newly uploaded image.
+                if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                    String publicId = cloudinaryService.extractPublicId(existingImageUrl);
+
                     if (publicId != null) {
                         cloudinaryService.deleteImage(publicId);
                     }
                 }
-                String newUrl = cloudinaryService.uploadProductImage(
-                        image, String.valueOf(product.getId()), "ADMIN");
+                String newUrl = cloudinaryService.uploadProductImage(image, String.valueOf(product.getId()), "ADMIN");
                 product.setImageUrl(newUrl);
+            } else if (Boolean.TRUE.equals(request.getRemoveImage())) {
+
+                // Remove the existing image without uploading a replacement.
+                if (existingImageUrl != null && !existingImageUrl.isBlank()) {
+                    String publicId = cloudinaryService.extractPublicId(existingImageUrl);
+
+                    if (publicId != null) {
+                        cloudinaryService.deleteImage(publicId);
+                    }
+                }
+                product.setImageUrl(null);
             }
-                Product updatedProduct = productPort.save(product);
+            Product updatedProduct = productPort.save(product);
 
             // 3️ - INVALIDATE cache
             invalidateProductUpdateCache(id, oldCategory);

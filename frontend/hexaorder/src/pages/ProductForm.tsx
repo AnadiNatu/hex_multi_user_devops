@@ -5,7 +5,6 @@ import {
   createProduct, updateProduct, fetchProductById,
   clearSelectedProduct, clearProductMessage,
 } from '../features/products/productsSlice';
-import { Widget } from '../components/ui/Widget';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
@@ -41,7 +40,8 @@ export default function ProductForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageFile,    setImageFile]    = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
-
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
+  
   const [formData, setFormData] = useState<ProductFormData>({
     name: '', description: '', price: 0, stock: 0, category: 'Electronics', isActive: true,
   });
@@ -53,31 +53,64 @@ export default function ProductForm() {
     return () => { dispatch(clearSelectedProduct()); dispatch(clearProductMessage()); };
   }, [dispatch, id, isEditMode]);
 
-  useEffect(() => {
-    if (selectedProduct && isEditMode) {
-      setFormData({
-        name: selectedProduct.name, description: selectedProduct.description,
-        price: selectedProduct.price, stock: selectedProduct.stock,
-        category: selectedProduct.category || 'Electronics', isActive: selectedProduct.isActive ?? true,
-      });
-      if (selectedProduct.image) setImagePreview(selectedProduct.image);
-    }
-  }, [selectedProduct, isEditMode]);
+ useEffect(() => {
+  if (selectedProduct && isEditMode) {
+    setFormData({
+      name: selectedProduct.name,
+      description: selectedProduct.description,
+      price: selectedProduct.price,
+      stock: selectedProduct.stock,
+      category: selectedProduct.category || 'Electronics',
+      isActive: selectedProduct.isActive ?? true,
+    });
+
+    setImagePreview(selectedProduct.image || '');
+    setImageFile(null);
+    setRemoveExistingImage(false);
+  }
+}, [selectedProduct, isEditMode]);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result as string);
-    reader.readAsDataURL(file);
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    dispatch(clearProductMessage());
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image size must not exceed 5 MB.');
+    e.target.value = '';
+    return;
+  }
+
+  setImageFile(file);
+  setRemoveExistingImage(false);
+
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    setImagePreview(reader.result as string);
   };
 
-  const clearImage = () => {
-    setImageFile(null);
-    setImagePreview(selectedProduct?.image || '');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+  reader.readAsDataURL(file);
+};
+
+const clearImage = () => {
+  setImageFile(null);
+  setImagePreview('');
+
+  // Tell the backend to delete the previously saved image.
+  if (isEditMode && selectedProduct?.image) {
+    setRemoveExistingImage(true);
+  }
+
+  if (fileInputRef.current) {
+    fileInputRef.current.value = '';
+  }
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -97,7 +130,14 @@ export default function ProductForm() {
     if (!validation.isValid) { setErrors(validation.errors as any); return; }
     try {
       if (isEditMode && id) {
-        await dispatch(updateProduct({ id, formData, imageFile })).unwrap();
+        await dispatch(
+  updateProduct({
+    id,
+    formData,
+    imageFile,
+    removeExistingImage,
+  })
+).unwrap();
       } else {
         await dispatch(createProduct({ formData, imageFile })).unwrap();
       }
@@ -108,7 +148,7 @@ export default function ProductForm() {
   if (fetchStatus === 'loading' && isEditMode) return <PageLoader />;
 
   return (
-    <div className="space-y-6 page-enter">
+    <div className="min-h-screen space-y-6 page-enter bg-slate-950 text-slate-100">
       <Breadcrumb items={[{ label: 'Products', href: '/products' }, { label: isEditMode ? 'Edit Product' : 'New Product' }]} />
 
       <div className="flex items-center gap-3">
@@ -116,7 +156,7 @@ export default function ProductForm() {
           Back
         </Button>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight" style={{ color: '#a6efa4' }}>
             {isEditMode ? 'Edit Product' : 'Create New Product'}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -128,8 +168,8 @@ export default function ProductForm() {
       {message && <Alert variant="success" dismissible onDismiss={() => dispatch(clearProductMessage())}>{message}</Alert>}
       {error   && <Alert variant="error"   dismissible onDismiss={() => dispatch(clearProductMessage())}>{error}</Alert>}
 
-      <div className="max-w-3xl">
-        <Widget>
+     <div className="w-full max-w-5xl">
+  <div className="rounded-2xl border border-slate-700 bg-slate-900/90 p-6 shadow-xl shadow-black/20 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div>
@@ -183,12 +223,12 @@ export default function ProductForm() {
 
             {/* Image upload */}
             <div>
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100">
-                Product Image
-              </h3>
+              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 pb-3 border-b border-slate-700">
+  Product Image
+</h3>
               {imagePreview ? (
                 <div className="relative inline-block">
-                  <img src={imagePreview} alt="Preview" className="w-48 h-48 object-cover rounded-xl border-2 border-slate-200" referrerPolicy="no-referrer" />
+                  <img src={imagePreview} alt="Preview" className="w-48 h-48 object-cover rounded-xl border-2 border-slate-600 shadow-lg" referrerPolicy="no-referrer" />
                   <button
                     type="button"
                     onClick={clearImage}
@@ -202,9 +242,9 @@ export default function ProductForm() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className={cn(
-                    'w-48 h-48 border-2 border-dashed border-slate-300 rounded-xl',
-                    'flex flex-col items-center justify-center gap-2.5 text-slate-400',
-                    'hover:border-brand-green hover:text-brand-green hover:bg-emerald-50/30 transition-all'
+                    'w-48 h-48 border-2 border-dashed border-slate-600 rounded-xl',
+'flex flex-col items-center justify-center gap-2.5 text-slate-400',
+'hover:border-emerald-400 hover:text-emerald-400 hover:bg-emerald-400/5 transition-all'
                   )}
                 >
                   <div className="p-3 bg-slate-100 rounded-xl">
@@ -236,8 +276,8 @@ export default function ProductForm() {
               </Button>
             </div>
           </form>
-        </Widget>
-      </div>
+          </div>
+        </div>
     </div>
   );
 }

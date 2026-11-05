@@ -120,10 +120,11 @@ fd.append("product", productBlob);
   },
 
 
-  updateProduct: async (
+ updateProduct: async (
   id: string,
   formData: ProductFormData,
-  imageFile?: File | null
+  imageFile?: File | null,
+  removeExistingImage = false
 ): Promise<Product> => {
 
   const fd = new FormData();
@@ -137,23 +138,24 @@ fd.append("product", productBlob);
         stockQuantity: formData.stock,
         category: formData.category,
         isActive: formData.isActive ?? true,
+        removeImage: removeExistingImage,
       }),
     ],
     {
-      type: "application/json",
+      type: 'application/json',
     }
   );
 
-  fd.append("product", productBlob);
+  fd.append('product', productBlob);
 
   if (imageFile) {
-    fd.append("image", imageFile);
+    fd.append('image', imageFile);
   }
 
   const json = await apiService.upload<any>(
     API_ENDPOINTS.PRODUCT_AT2_UPDATE_PRICE(id),
     fd,
-    "PUT"
+    'PUT'
   );
 
   return mapBackendProduct(json.product || json);

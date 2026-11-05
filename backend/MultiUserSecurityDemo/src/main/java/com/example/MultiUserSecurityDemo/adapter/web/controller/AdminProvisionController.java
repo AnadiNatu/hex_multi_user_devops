@@ -58,7 +58,7 @@ public class AdminProvisionController {
         if (response.getId() != null) {
             // ADMIN-created users are pre-approved; they only need email verification
             userType1Port.findByEmail(request.getEmail()).ifPresent(u -> {
-                u.setApproved(true);          // pre-approved by ADMIN
+                u.setApproved(false);          // pre-approved by ADMIN
 //                u.setCreatedByAdmin(callerEmail);
                 u.setCreatedByAdmin(true);
                 userType1Port.save(u);
@@ -84,6 +84,7 @@ public class AdminProvisionController {
                         return ResponseEntity.ok(Map.<String, Object>of("message", "User is already approved.", "userId", id));
                     }
                     u.setApproved(true);
+                    u.setEmailVerified(true);
                     userType1Port.save(u);
 
                     // Notify the user
@@ -98,7 +99,9 @@ public class AdminProvisionController {
                             "message", "User approved successfully.",
                             "userId", id,
                             "email", u.getEmail(),
-                            "role", u.getRoles1().name()
+                            "role", u.getRoles1().name(),
+                            "approved", u.isApproved(),
+                            "emailVerified" , u.isEmailVerified()
                     ));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "TYPE1 user not found with id=" + id)));
@@ -150,7 +153,7 @@ public class AdminProvisionController {
         if (response.getId() != null) {
             // Pre-approve: admin2-created users only need email verification
             userType2Port.findByEmail(request.getEmail()).ifPresent(u -> {
-                u.setApproved(true);
+                u.setApproved(false);
 //                u.setCreatedByAdmin(callerEmail);
                 u.setCreatedByAdmin(true);
                 userType2Port.save(u);
@@ -179,6 +182,7 @@ public class AdminProvisionController {
                         return ResponseEntity.ok(Map.<String, Object>of("message", "User is already approved.", "userId", id));
                     }
                     u.setApproved(true);
+                    u.setEmailVerified(true);
                     userType2Port.save(u);
 
                     try {
@@ -192,7 +196,9 @@ public class AdminProvisionController {
                             "message", "User approved successfully.",
                             "userId", id,
                             "email", u.getEmail(),
-                            "role", u.getRole().name()
+                            "role", u.getRole().name(),
+                            "approved", u.isApproved(),
+                            "emailVerified" , u.isEmailVerified()
                     ));
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
