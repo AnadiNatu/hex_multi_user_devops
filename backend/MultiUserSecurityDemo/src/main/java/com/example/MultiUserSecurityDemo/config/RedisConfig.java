@@ -21,7 +21,7 @@ public class RedisConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
-    @Value("${spring.redis.host:localhost}")
+    @Value("${spring.redis.host:redis-app}")
     private String redisHost;
 
     @Value("${spring.redis.port:6379}")
