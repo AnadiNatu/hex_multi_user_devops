@@ -24,7 +24,7 @@ public class UserType1Mapper {
         domain.setProfilePicture(entity.getProfilePicture());
         domain.setApproved(entity.isApproved());
         domain.setEmailVerified(entity.isEmailVerified());
-        domain.setCreatedByAdmin(true);
+        domain.setCreatedByAdmin("SYSTEM");
 //        domain.setCreatedByAdmin(entity.getCreatedByAdmin());
 
         return domain;
@@ -45,9 +45,7 @@ public class UserType1Mapper {
                 .profilePicture(domain.getProfilePicture())
                 .isApproved(domain.isApproved())
                 .emailVerified(domain.isEmailVerified())
-                .createdByAdmin(true)
+                .createdByAdmin("SYSTEM")
                 .build();
-
     }
-
 }

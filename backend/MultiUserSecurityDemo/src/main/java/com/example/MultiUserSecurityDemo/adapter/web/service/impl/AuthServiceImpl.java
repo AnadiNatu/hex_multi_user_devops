@@ -88,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
             // New accounts start unapproved and unverified
             user.setApproved(false);
             user.setEmailVerified(false);
-            user.setCreatedByAdmin(true);
+            user.setCreatedByAdmin("SYSTEM");
 
             UserType1 saved = userType1Port.save(user);
             log.debug("[registerUserType1] Persisted | id={} | email={} | role={}", saved.getId(), saved.getEmail(), saved.getRoles1());
@@ -120,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
             // New accounts start unapproved and unverified
             user.setApproved(false);
             user.setEmailVerified(false);
-            user.setCreatedByAdmin(true);
+            user.setCreatedByAdmin("SYSTEM");
 
             UserType2 saved = userType2Port.save(user);
             log.debug("[registerUserType2] Persisted | id={} | email={} | role={}", saved.getId(), saved.getEmail(), saved.getRole());

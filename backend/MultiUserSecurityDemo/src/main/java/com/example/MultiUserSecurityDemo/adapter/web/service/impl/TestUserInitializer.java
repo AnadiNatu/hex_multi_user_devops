@@ -62,7 +62,7 @@ public class TestUserInitializer implements ApplicationRunner {
         admin.setRoles1(role);
         admin.setApproved(true);
         admin.setEmailVerified(true);
-        admin.setCreatedByAdmin(true);
+        admin.setCreatedByAdmin("SYSTEM");
         admin.setProfilePicture(null);
         userType1Port.save(admin);
 
@@ -87,7 +87,7 @@ public class TestUserInitializer implements ApplicationRunner {
         user.setApproved(true);
         user.setEmailVerified(true);
         user.setProvider("LOCAL");
-        user.setCreatedByAdmin(true);
+        user.setCreatedByAdmin("SYSTEM");
         user.setProfilePicture(null);
         userType2Port.save(user);
         log.info("Created USER -> {} ({})", email, role);

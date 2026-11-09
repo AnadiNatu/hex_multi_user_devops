@@ -26,7 +26,7 @@ public class UserType2Mapper {
         domain.setProviderId(entity.getProviderId());
         domain.setApproved(entity.isApproved());
         domain.setEmailVerified(entity.isEmailVerified());
-        domain.setCreatedByAdmin(true);
+        domain.setCreatedByAdmin("SYSTEM");
         return domain;
     }
 
@@ -47,9 +47,8 @@ public class UserType2Mapper {
                 .providerId(domain.getProviderId())
                 .isApproved(domain.isApproved())
                 .emailVerified(domain.isEmailVerified())
-                .createdByAdmin(true)
+                .createdByAdmin("SYSTEM")
                 .build();
-
     }
 
 }

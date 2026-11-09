@@ -11,7 +11,6 @@ import lombok.*;
 @Builder
 @Table(name = "user_type2")
 public class UserType2Entity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -56,5 +55,5 @@ public class UserType2Entity {
     private boolean emailVerified = false;
 
     @Column(name = "created_by_admin")
-    private boolean createdByAdmin;
+    private String createdByAdmin;
 }

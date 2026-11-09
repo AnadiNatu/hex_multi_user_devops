@@ -60,7 +60,7 @@ public class AdminProvisionController {
             userType1Port.findByEmail(request.getEmail()).ifPresent(u -> {
                 u.setApproved(false);          // pre-approved by ADMIN
 //                u.setCreatedByAdmin(callerEmail);
-                u.setCreatedByAdmin(true);
+                u.setCreatedByAdmin("SYSTEM");
                 userType1Port.save(u);
             });
 
@@ -155,7 +155,7 @@ public class AdminProvisionController {
             userType2Port.findByEmail(request.getEmail()).ifPresent(u -> {
                 u.setApproved(false);
 //                u.setCreatedByAdmin(callerEmail);
-                u.setCreatedByAdmin(true);
+                u.setCreatedByAdmin("SYSTEM");
                 userType2Port.save(u);
             });
 
